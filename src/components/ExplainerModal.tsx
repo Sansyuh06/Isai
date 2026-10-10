@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlertTriangle, Music, Cpu, Sparkles } from 'lucide-react';
+import { X, AlertTriangle, Music, Cpu } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -11,51 +11,50 @@ export const ExplainerModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-paper/50 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl text-slate-200 space-y-6">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface border border-hairline rounded-[10px] p-8 shadow-xl text-ink space-y-6">
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 p-1.5 rounded-full text-muted hover:text-ink hover:bg-paper transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          aria-label="Close dialog"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <Sparkles className="w-5 h-5 text-cyan-400" />
-            <h2 id="modal-title" className="text-lg font-bold text-white">
-              About The 8/9 Duet & Scientific Scope
-            </h2>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-            aria-label="Close dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+        <div className="pr-12">
+          <h2 id="modal-title" className="text-[20px] font-bold tracking-tight">
+            About The 8/9 Duet & Scientific Scope
+          </h2>
         </div>
 
         {/* Project Essence */}
-        <div className="space-y-3 text-sm leading-relaxed text-slate-300">
+        <div className="space-y-4 text-[14px] leading-relaxed text-muted">
           <p>
             <strong>The 8/9 Duet</strong> transforms the seminal Mermin–Peres Magic Square pseudo-telepathy game into an interactive, audio-first quantum acoustic exploration. In quantum information theory, pseudo-telepathy games demonstrate that entangled quantum players can achieve coordination tasks with unit success probability that are mathematically impossible for classical players without communication.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <div className="p-3 bg-cyan-950/30 border border-cyan-500/30 rounded-xl">
-              <div className="flex items-center gap-2 font-bold text-cyan-300 text-xs mb-1">
-                <Music className="w-4 h-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="p-4 bg-paper rounded-[6px] border border-hairline">
+              <div className="flex items-center gap-2 font-bold text-ink text-[14px] mb-2">
+                <Music className="w-4 h-4 text-muted" />
                 <span>Stereo Sonification</span>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-[12px] text-muted">
                 Alice’s phrase is panned left; Bob’s phrase is panned right. Matching bits at the shared crossing sound in clean resonant unison; disagreement produces discordant semitones.
               </p>
             </div>
-            <div className="p-3 bg-purple-950/30 border border-purple-500/30 rounded-xl">
-              <div className="flex items-center gap-2 font-bold text-purple-300 text-xs mb-1">
-                <Cpu className="w-4 h-4" />
+            <div className="p-4 bg-paper rounded-[6px] border border-hairline">
+              <div className="flex items-center gap-2 font-bold text-ink text-[14px] mb-2">
+                <Cpu className="w-4 h-4 text-muted" />
                 <span>Genuine Quantum Circuits</span>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-[12px] text-muted">
                 Prepared with two genuine Bell pairs |Φ+⟩ on 4 qubits, local Clifford rotations, and local decoding. No lookup tables, no fake data.
               </p>
             </div>
@@ -63,12 +62,12 @@ export const ExplainerModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Honest Scientific Scope & Limitations */}
-        <div className="bg-amber-950/30 border border-amber-500/40 rounded-xl p-4 space-y-3">
-          <div className="flex items-center gap-2 font-bold text-amber-300 text-sm">
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
+        <div className="bg-loss/5 border border-loss/20 rounded-[6px] p-5 space-y-4">
+          <div className="flex items-center gap-2 font-bold text-loss text-[14px]">
+            <AlertTriangle className="w-4 h-4" />
             <span>Honest Scientific Scope & Physical Limitations</span>
           </div>
-          <ul className="space-y-2 text-xs text-amber-100/90 list-disc list-inside leading-relaxed">
+          <ul className="space-y-3 text-[12px] text-loss/80 list-disc list-inside leading-relaxed">
             <li>
               <strong>Established Foundation:</strong> The Magic Square game and its quantum strategy are well-established theoretical constructions. The project’s distinguishing feature is the musical, interactive presentation and verified execution pipeline.
             </li>
@@ -85,17 +84,6 @@ export const ExplainerModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <strong>Sample Statistics:</strong> A single run or small shot sample is not sufficient to establish a statistically conclusive asymptotic win rate.
             </li>
           </ul>
-        </div>
-
-        {/* Close Button */}
-        <div className="flex justify-end pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs transition-colors"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

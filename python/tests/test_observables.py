@@ -1,12 +1,8 @@
 """Unit tests for Mermin-Peres observables and algebraic properties."""
 
-import pytest
 import numpy as np
 from mermin_peres.observables import (
     ALICE_OBSERVABLE_GRID,
-    OBSERVABLE_LABELS,
-    get_alice_observables,
-    get_bob_observables,
     verify_algebraic_properties
 )
 

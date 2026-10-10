@@ -9,7 +9,10 @@ import os
 import json
 from datetime import datetime, timezone
 from collections import Counter
+import sys
 from qiskit_aer import AerSimulator
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from mermin_peres.circuit import (
     build_mermin_peres_circuit,

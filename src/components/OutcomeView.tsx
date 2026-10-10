@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ContextData, CountItem } from '../types/data';
-import { CheckCircle2, XCircle, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { OBSERVABLE_MATRIX } from './MagicGrid';
 
 interface Props {
@@ -16,12 +16,11 @@ export const OutcomeView: React.FC<Props> = ({
   onSelectSampleIndex,
   currentCountItem
 }) => {
-  const { row, column, shots, wins, win_rate, confidence_interval_95, counts } = contextData;
+  const [showOutcomes, setShowOutcomes] = useState(false);
+
+  const { row, column, shots, win_rate, confidence_interval_95, counts } = contextData;
   const aliceBits = currentCountItem.alice_bits;
   const bobBits = currentCountItem.bob_bits;
-
-  const aliceParity = aliceBits[0] ^ aliceBits[1] ^ aliceBits[2];
-  const bobParity = bobBits[0] ^ bobBits[1] ^ bobBits[2];
 
   const aliceSharedBit = aliceBits[column];
   const bobSharedBit = bobBits[row];
@@ -31,219 +30,146 @@ export const OutcomeView: React.FC<Props> = ({
   const crossingObservable = OBSERVABLE_MATRIX[row][column];
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-md space-y-5">
+    <div className="bg-surface border border-hairline rounded-[10px] p-5 shadow-sm space-y-5">
       {/* Header Context Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-hairline">
         <div>
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <span>Context: Row {row + 1} × Column {colHeader(column)}</span>
-            <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-800 text-yellow-300 border border-yellow-500/30">
-              Shared Cell ({row + 1}, {column + 1}): {crossingObservable}
-            </span>
-          </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Alice is queried on row {row + 1}; Bob is queried on column {column + 1}.
+          <h2 className="text-[20px] font-bold text-ink tracking-tight leading-tight">
+            Row {row + 1} × Column {column + 1}
+          </h2>
+          <p className="text-[14px] text-muted mt-0.5">
+            Shared Cell: <span className="font-mono">{crossingObservable}</span>
           </p>
         </div>
 
         {/* Win Rate & CI Pill */}
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-xs font-semibold text-slate-400">Context Win Rate</div>
-            <div className="text-lg font-extrabold text-cyan-300 font-mono">
-              {(win_rate * 100).toFixed(1)}%
-              <span className="text-xs font-normal text-slate-400 ml-1">
-                ({wins}/{shots})
-              </span>
-            </div>
+        <div className="text-right">
+          <div className="text-[12px] font-semibold text-muted uppercase tracking-wider">Context Win Rate</div>
+          <div className="text-[20px] font-bold text-ink font-mono tracking-tight flex items-baseline justify-end gap-2">
+            {(win_rate * 100).toFixed(1)}%
+            <span className="text-[12px] font-normal text-muted font-sans">
+              [{confidence_interval_95 ? (confidence_interval_95[0]*100).toFixed(1) : ''}%, {confidence_interval_95 ? (confidence_interval_95[1]*100).toFixed(1) : ''}%]
+            </span>
           </div>
-          {confidence_interval_95 && (
-            <div className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-1 rounded border border-slate-700">
-              95% CI: [{(confidence_interval_95[0] * 100).toFixed(1)}%,{' '}
-              {(confidence_interval_95[1] * 100).toFixed(1)}%]
-            </div>
-          )}
         </div>
       </div>
 
       {/* Players' Decoded Bits Comparison */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Alice Panel (Left) */}
-        <div className="bg-cyan-950/20 border border-cyan-500/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-              Alice (Row {row + 1})
-            </span>
-            <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
-              Left Pan
-            </span>
+        <div>
+          <div className="flex items-center gap-1.5 mb-2 text-alice-text font-bold text-[14px]">
+            <span className="w-3 h-3 rounded-[2px] bg-alice/10 border border-alice/20"></span>
+            Alice
           </div>
-
-          <div className="flex items-center justify-around gap-2 my-2">
-            {[0, 1, 2].map((c) => {
-              const isCrossing = c === column;
-              const bit = aliceBits[c];
-              return (
-                <div
-                  key={`alice-bit-${c}`}
-                  className={`flex flex-col items-center p-2 rounded-lg border flex-1 text-center ${
-                    isCrossing
-                      ? 'bg-yellow-500/20 border-yellow-400/80 ring-2 ring-yellow-400/40'
-                      : 'bg-slate-800/60 border-slate-700'
-                  }`}
-                >
-                  <span className="text-[10px] text-slate-400 uppercase">Col {c + 1}</span>
-                  <span className="text-xl font-mono font-black text-white">{bit}</span>
-                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">
-                    {OBSERVABLE_MATRIX[row][c]}
-                  </span>
-                  {isCrossing && (
-                    <span className="text-[9px] font-bold text-yellow-300 mt-0.5">Crossing</span>
-                  )}
-                </div>
-              );
-            })}
+          <div className="text-[28px] font-mono font-black text-ink tracking-[0.5em] text-center border-y border-hairline py-3">
+            {aliceBits.join('')}
           </div>
-
-          <div className="mt-3 pt-2 border-t border-cyan-500/20 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Parity Check (a₁ ⊕ a₂ ⊕ a₃):</span>
-            <span className="font-mono font-bold text-emerald-400 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {aliceParity} (Even = 0)
-            </span>
+          <div className="mt-2 flex items-center justify-between text-[12px]">
+            <span className="text-muted font-mono">Row {row + 1}</span>
+            <span className="text-muted">Even parity ✓</span>
           </div>
         </div>
 
         {/* Bob Panel (Right) */}
-        <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-              Bob (Column {column + 1})
-            </span>
-            <span className="text-xs font-mono text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
-              Right Pan
-            </span>
+        <div>
+          <div className="flex items-center gap-1.5 mb-2 text-bob-text font-bold text-[14px]">
+            <span className="w-3 h-3 rounded-[2px] bg-bob/10 border border-bob/20"></span>
+            Bob
           </div>
-
-          <div className="flex items-center justify-around gap-2 my-2">
-            {[0, 1, 2].map((r) => {
-              const isCrossing = r === row;
-              const bit = bobBits[r];
-              return (
-                <div
-                  key={`bob-bit-${r}`}
-                  className={`flex flex-col items-center p-2 rounded-lg border flex-1 text-center ${
-                    isCrossing
-                      ? 'bg-yellow-500/20 border-yellow-400/80 ring-2 ring-yellow-400/40'
-                      : 'bg-slate-800/60 border-slate-700'
-                  }`}
-                >
-                  <span className="text-[10px] text-slate-400 uppercase">Row {r + 1}</span>
-                  <span className="text-xl font-mono font-black text-white">{bit}</span>
-                  <span className="text-[9px] text-slate-400 font-mono mt-0.5">
-                    {OBSERVABLE_MATRIX[r][column]}
-                  </span>
-                  {isCrossing && (
-                    <span className="text-[9px] font-bold text-yellow-300 mt-0.5">Crossing</span>
-                  )}
-                </div>
-              );
-            })}
+          <div className="text-[28px] font-mono font-black text-ink tracking-[0.5em] text-center border-y border-hairline py-3">
+            {bobBits.join('')}
           </div>
-
-          <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Parity Check (b₁ ⊕ b₂ ⊕ b₃):</span>
-            <span className="font-mono font-bold text-emerald-400 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {bobParity} (Odd = 1)
-            </span>
+          <div className="mt-2 flex items-center justify-between text-[12px]">
+            <span className="text-muted font-mono">Col {column + 1}</span>
+            <span className="text-muted">Odd parity ✓</span>
           </div>
         </div>
       </div>
 
       {/* Shared Crossing Verdict Callout */}
       <div
-        className={`p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-          roundWin
-            ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200'
-            : 'bg-rose-950/40 border-rose-500/50 text-rose-200'
+        className={`p-4 rounded-[6px] flex flex-col sm:flex-row items-center justify-between gap-4 border ${
+          roundWin ? 'bg-win/10 text-win border-win/20' : 'bg-loss/10 text-loss border-loss/20'
         }`}
       >
-        <div className="flex items-center gap-3">
-          {roundWin ? (
-            <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-          ) : (
-            <XCircle className="w-6 h-6 text-rose-400 flex-shrink-0" />
-          )}
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="flex items-center justify-center gap-3 bg-surface px-4 py-2 rounded-[6px] shadow-sm font-mono text-[20px] font-bold text-ink border border-hairline">
+            <span>{aliceSharedBit}</span>
+            <span className="text-muted text-[16px]">vs</span>
+            <span>{bobSharedBit}</span>
+          </div>
           <div>
-            <div className="font-bold text-sm">
-              Crossing Cell ({row + 1}, {column + 1}) Check:{' '}
-              {sharedMatch ? 'MATCH (Unison Sound) — ROUND WON' : 'MISMATCH (Dissonance) — ROUND LOST'}
+            <div className={`font-bold text-[16px] leading-tight ${roundWin ? 'text-win' : 'text-loss'}`}>
+              {sharedMatch ? 'MATCH — round won' : 'MISMATCH — round lost'}
             </div>
-            <div className="text-xs opacity-90 mt-0.5 font-mono">
-              Alice bit at col {column + 1} = <strong>{aliceSharedBit}</strong> vs Bob bit at row{' '}
-              {row + 1} = <strong>{bobSharedBit}</strong>
+            <div className={`text-[12px] font-medium mt-0.5 ${roundWin ? 'text-win/80' : 'text-loss/80'}`}>
+              Outcome pattern {activeSampleIndex + 1} of {counts.length} · {currentCountItem.count} of {shots} shots
             </div>
           </div>
-        </div>
-
-        <div className="text-xs font-mono px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700">
-          Sample {activeSampleIndex + 1} of {counts.length} ({currentCountItem.count} shots in this configuration)
         </div>
       </div>
 
       {/* Honest Scientific Clarification on Parity Inference */}
-      <div className="p-3 bg-slate-800/40 border border-slate-700/60 rounded-xl flex items-start gap-2.5 text-xs text-slate-300">
-        <Info className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-        <div>
-          <strong>Construction Notice:</strong> Because each player measures two compatible observables and infers the third via the required algebraic parity, parity passes by construction. <strong>Shared-cell agreement</strong> is the true noise-sensitive test of quantum state fidelity and nonlocality.
+      <details className="text-[12px] text-muted [&_summary::-webkit-details-marker]:hidden">
+        <summary className="cursor-pointer font-medium hover:text-ink transition-colors flex items-center gap-1">
+          <span className="inline-block w-3.5 h-3.5 border border-current rounded-full text-center leading-[11px] text-[10px]">i</span>
+          Note on parity inference
+        </summary>
+        <div className="mt-2 pl-4 border-l-2 border-hairline leading-relaxed">
+          Because each player measures two compatible observables and infers the third via the required algebraic parity, parity passes by construction. <strong>Shared-cell agreement</strong> is the true noise-sensitive test of quantum state fidelity and nonlocality.
         </div>
-      </div>
+      </details>
 
-      {/* Sample Distribution Browser */}
+      {/* Collapsible Sample Distribution Browser */}
       {counts.length > 1 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-            <span>Observed Bitstring Outcomes in this Context:</span>
-            <span>Click to inspect & replay sample</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {counts.map((item, idx) => {
-              const isSelected = idx === activeSampleIndex;
-              const pct = ((item.count / shots) * 100).toFixed(1);
-              return (
-                <button
-                  key={`sample-btn-${idx}`}
-                  type="button"
-                  onClick={() => onSelectSampleIndex(idx)}
-                  className={`p-2 rounded-lg border text-left font-mono text-xs transition-all ${
-                    isSelected
-                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-100 ring-2 ring-cyan-400/40 font-bold'
-                      : 'bg-slate-800/50 border-slate-700/70 text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">#{idx + 1}</span>
-                    <span className="text-[10px] text-cyan-300">{pct}%</span>
-                  </div>
-                  <div className="text-[11px] mt-1">
-                    A:[{item.alice_bits.join('')}] B:[{item.bob_bits.join('')}]
-                  </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
-                    {item.count} shots · {item.win ? 'Win' : 'Loss'}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+        <div className="border border-hairline rounded-[6px] overflow-hidden bg-surface">
+          <button
+            type="button"
+            onClick={() => setShowOutcomes(!showOutcomes)}
+            className="w-full px-4 py-3 bg-paper hover:bg-hairline flex items-center justify-between text-[14px] font-semibold text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          >
+            <span>Measured Outcomes ({counts.length} patterns)</span>
+            {showOutcomes ? <ChevronUp className="w-4 h-4 text-muted" /> : <ChevronDown className="w-4 h-4 text-muted" />}
+          </button>
+          
+          {showOutcomes && (
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 border-t border-hairline bg-surface">
+              {counts.map((item, idx) => {
+                const isSelected = idx === activeSampleIndex;
+                const pct = ((item.count / shots) * 100).toFixed(1);
+                return (
+                  <button
+                    key={`sample-btn-${idx}`}
+                    type="button"
+                    onClick={() => onSelectSampleIndex(idx)}
+                    className={`p-3 rounded-[6px] border text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
+                      isSelected
+                        ? 'bg-ink border-ink text-surface shadow-sm'
+                        : 'bg-surface border-hairline text-ink hover:bg-paper'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-[12px] font-semibold ${isSelected ? 'text-surface/80' : 'text-muted'}`}>Pattern {idx + 1}</span>
+                      <span className={`text-[12px] font-bold ${isSelected ? 'text-surface' : 'text-ink'}`}>{pct}%</span>
+                    </div>
+                    <div className={`text-[14px] font-mono tracking-widest ${isSelected ? 'text-surface/90' : 'text-ink'}`}>
+                      A:{item.alice_bits.join('')} B:{item.bob_bits.join('')}
+                    </div>
+                    <div className={`text-[12px] mt-1.5 flex items-center gap-1.5 ${isSelected ? 'text-surface/70' : 'text-muted'}`}>
+                      <span className="font-semibold">{item.count}</span> shots
+                      <span>·</span>
+                      <span className={item.win ? (isSelected ? 'text-win/90' : 'text-win') : (isSelected ? 'text-loss/90' : 'text-loss')}>
+                        {item.win ? 'Win' : 'Loss'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 };
-
-function colHeader(c: number): number {
-  return c + 1;
-}

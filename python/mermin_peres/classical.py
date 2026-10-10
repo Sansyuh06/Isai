@@ -19,7 +19,7 @@ Bob:
 """
 
 import itertools
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Any
 from .scoring import check_round_outcome
 
 # All valid even-parity triples (sum mod 2 == 0)
@@ -96,9 +96,7 @@ def run_exhaustive_classical_search() -> Dict[str, Any]:
     num_achieving_max = 0
 
     for ap in alice_policies:
-        ap_dict = {0: ap[0], 1: ap[1], 2: ap[2]}
         for bp in bob_policies:
-            bp_dict = {0: bp[0], 1: bp[1], 2: bp[2]}
             current_wins = 0
             for r in range(3):
                 for c in range(3):

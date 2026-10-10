@@ -28,69 +28,55 @@ export const Header: React.FC<Props> = ({
     const file = e.target.files?.[0];
     if (file) {
       onImportFile(file);
-      e.target.value = ''; // Reset input
+      e.target.value = '';
     }
   };
 
   return (
-    <header className="bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40 px-4 py-3 sm:px-8">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Brand & Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-xl">
-            8/9
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                The 8/9 Duet
-              </h1>
-              <SourceBadge
-                sourceType={currentSource}
-                backendName={backendName}
-                jobId={jobId}
-                className="hidden sm:inline-flex"
-              />
-            </div>
-            <p className="text-xs text-slate-400 font-medium">
-              Acoustic Exploration of the Mermin–Peres Quantum Pseudo-Telepathy Game
-            </p>
-          </div>
+    <header className="bg-surface border-b border-hairline sticky top-0 z-40 px-4 py-2 sm:px-8">
+      <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Brand & Source Badge */}
+        <div className="flex items-center gap-4">
+          <h1 className="text-lg font-bold tracking-tight text-ink leading-none">
+            The 8/9 Duet
+          </h1>
+          <SourceBadge
+            sourceType={currentSource}
+            backendName={backendName}
+            jobId={jobId}
+            className="hidden sm:inline-flex"
+          />
         </div>
 
         {/* Source Selector & Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Source Tabs */}
-          <div className="flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Segmented Control */}
+          <div className="flex items-center p-0.5 rounded-md bg-hairline text-sm font-medium">
             <button
               type="button"
               onClick={() => onSelectSource('qiskit_aer')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-[4px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
                 currentSource === 'qiskit_aer'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-surface text-ink shadow-sm'
+                  : 'text-muted hover:text-ink'
               }`}
             >
-              Aer simulator run
+              Aer run
             </button>
             <button
               type="button"
               onClick={() => onSelectSource('ibm_hardware')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-[4px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
                 currentSource === 'ibm_hardware'
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/50 shadow-sm'
-                  : hasHardwareData
-                  ? 'text-slate-400 hover:text-slate-200'
-                  : 'text-slate-500 hover:text-purple-300'
+                  ? 'bg-surface text-ink shadow-sm'
+                  : 'text-muted hover:text-ink'
               }`}
-              title={hasHardwareData ? 'Inspect recorded IBM QPU run' : 'No recorded IBM run loaded yet'}
             >
-              Recorded IBM hardware run
-              {!hasHardwareData && (
-                <span className="ml-1 text-[10px] text-slate-500 font-mono">(empty)</span>
-              )}
+              {hasHardwareData ? 'Recorded IBM run' : 'No recorded IBM run'}
             </button>
           </div>
+
+          <div className="w-px h-5 bg-hairline mx-1 hidden sm:block"></div>
 
           {/* Import JSON File */}
           <input
@@ -103,22 +89,20 @@ export const Header: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium transition-all active:scale-95 shadow-sm"
-            title="Import a validated IBM Hardware or Aer JSON results file"
+            className="inline-flex items-center gap-1.5 px-2 py-1 text-muted hover:text-ink text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-sm"
           >
-            <UploadCloud className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline">Import Run</span>
+            <UploadCloud className="w-4 h-4" />
+            <span className="hidden sm:inline">Import</span>
           </button>
 
-          {/* About / Limitations Dialog Toggle */}
+          {/* About Dialog Toggle */}
           <button
             type="button"
             onClick={onOpenAbout}
-            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all"
-            title="About & Scientific Limitations"
-            aria-label="About & Scientific Limitations"
+            className="inline-flex items-center gap-1.5 px-2 py-1 text-muted hover:text-ink text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-sm"
           >
-            <HelpCircle className="w-4 h-4 text-slate-300" />
+            <HelpCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">About</span>
           </button>
         </div>
       </div>

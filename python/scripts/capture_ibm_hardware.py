@@ -18,22 +18,22 @@ from datetime import datetime, timezone
 from collections import Counter
 
 # Ensure python directory is on sys.path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python"))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 try:
-    from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
-    from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
+    from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler  # noqa: E402
+    from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager  # noqa: E402
 except ImportError as e:
     print(f"Error: Required packages missing. Please install qiskit and qiskit-ibm-runtime.\nDetails: {e}")
     sys.exit(1)
 
-from mermin_peres.circuit import (
+from mermin_peres.circuit import (  # noqa: E402
     build_mermin_peres_circuit,
     decode_alice_response,
     decode_bob_response
 )
-from mermin_peres.scoring import check_round_outcome, wilson_score_interval
-from mermin_peres.schema_validator import validate_results_data
+from mermin_peres.scoring import check_round_outcome, wilson_score_interval  # noqa: E402
+from mermin_peres.schema_validator import validate_results_data  # noqa: E402
 
 
 def get_authenticated_service() -> QiskitRuntimeService:
@@ -47,7 +47,7 @@ def get_authenticated_service() -> QiskitRuntimeService:
         else:
             print("[Auth] Checking locally saved Qiskit IBM credentials...")
             return QiskitRuntimeService(channel="ibm_quantum")
-    except Exception as err:
+    except Exception:
         print("\n" + "="*70)
         print("ERROR: IBM Quantum credentials not found or invalid.")
         print("="*70)

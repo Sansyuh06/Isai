@@ -1,6 +1,5 @@
 """Unit tests for classical strategies and upper bounds."""
 
-import pytest
 from mermin_peres.scoring import check_round_outcome
 from mermin_peres.classical import (
     evaluate_baseline_strategy,

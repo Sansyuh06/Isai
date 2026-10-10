@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MerminPeresDataset, SourceType, ContextData, CountItem } from './types/data';
+import React, { useState, useRef } from 'react';
+import { MerminPeresDataset, SourceType } from './types/data';
 import defaultAerDataset from './data/defaultAerData.json';
 import { validateDatasetJson } from './utils/validator';
 import { audioEngine, VisualStepEvent } from './audio/synth';
 
-// Components
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Header } from './components/Header';
-import { MagicGrid } from './components/MagicGrid';
-import { AudioControls } from './components/AudioControls';
-import { OutcomeView } from './components/OutcomeView';
+import { GuidedRound } from './components/GuidedRound';
 import { ClassicalComparison } from './components/ClassicalComparison';
 import { WinRateChart } from './components/WinRateChart';
 import { HistoryTable } from './components/HistoryTable';
@@ -18,50 +16,22 @@ import { SourcesPanel } from './components/SourcesPanel';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Datasets
   const [aerData, setAerData] = useState<MerminPeresDataset>(defaultAerDataset as unknown as MerminPeresDataset);
   const [ibmData, setIbmData] = useState<MerminPeresDataset | null>(null);
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
 
-  // Interactive Selection
-  const [selectedRow, setSelectedRow] = useState<number>(0); // 0, 1, 2
-  const [selectedCol, setSelectedCol] = useState<number>(0); // 0, 1, 2
-  const [sampleIndex, setSampleIndex] = useState<number>(0);
-
-  // Audio Playback State
-  const [isPlayingSample, setIsPlayingSample] = useState<boolean>(false);
-  const [isPlayingAll, setIsPlayingAll] = useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = useState<number>(0);
+  const [selectedCol, setSelectedCol] = useState<number>(0);
+  
   const [activeStepEvent, setActiveStepEvent] = useState<VisualStepEvent | null>(null);
-  const [volume, setVolume] = useState<number>(0.7);
-  const [muted, setMuted] = useState<boolean>(false);
 
-  // Modals & Notifications
   const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Stop flag ref for multi-round playback
   const isCancelledRef = useRef<boolean>(false);
 
-  // Active dataset according to selected source
   const currentDataset = currentSource === 'ibm_hardware' ? ibmData : aerData;
 
-  // Find currently selected context
-  const currentContext: ContextData | undefined = currentDataset?.contexts.find(
-    (c) => c.row === selectedRow && c.column === selectedCol
-  );
-
-  // Current sample count item
-  const currentCountItem: CountItem | undefined =
-    currentContext && currentContext.counts[sampleIndex]
-      ? currentContext.counts[sampleIndex]
-      : currentContext?.counts[0];
-
-  // Reset sample index when context changes
-  useEffect(() => {
-    setSampleIndex(0);
-  }, [selectedRow, selectedCol, currentSource]);
-
-  // Handle file import
   const handleImportFile = async (file: File) => {
     try {
       const text = await file.text();
@@ -100,30 +70,8 @@ export const App: React.FC = () => {
     }
   };
 
-  // Play single recorded sample
-  const handlePlaySample = async () => {
-    if (!currentContext || !currentCountItem) return;
-    setIsPlayingSample(true);
-    isCancelledRef.current = false;
-
-    try {
-      await audioEngine.playContextRound(
-        currentContext.row,
-        currentContext.column,
-        currentCountItem.alice_bits,
-        currentCountItem.bob_bits,
-        (event) => setActiveStepEvent(event)
-      );
-    } finally {
-      setIsPlayingSample(false);
-      setActiveStepEvent(null);
-    }
-  };
-
-  // Play all 9 contexts sequentially (Nine-Bar Duet)
   const handlePlayAll = async () => {
     if (!currentDataset) return;
-    setIsPlayingAll(true);
     isCancelledRef.current = false;
 
     const contexts = currentDataset.contexts;
@@ -144,11 +92,9 @@ export const App: React.FC = () => {
         );
 
         if (!finished || isCancelledRef.current) break;
-        // Pause between bars
         await new Promise((r) => setTimeout(r, 200));
       }
     } finally {
-      setIsPlayingAll(false);
       setActiveStepEvent(null);
     }
   };
@@ -156,14 +102,11 @@ export const App: React.FC = () => {
   const handleStop = () => {
     isCancelledRef.current = true;
     audioEngine.stopAll();
-    setIsPlayingSample(false);
-    setIsPlayingAll(false);
     setActiveStepEvent(null);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-slate-950">
-      {/* Header */}
+    <div className="min-h-screen bg-paper text-ink flex flex-col font-sans selection:bg-alice selection:text-surface">
       <Header
         currentSource={currentSource}
         onSelectSource={(src) => setCurrentSource(src)}
@@ -174,151 +117,113 @@ export const App: React.FC = () => {
         jobId={currentDataset?.ibm_job_id}
       />
 
-      {/* Global Notification Banner */}
       {notification && (
         <div
-          className={`px-4 py-2 text-xs flex items-center justify-between border-b ${
+          className={`px-4 py-3 text-[14px] flex items-center justify-between border-b ${
             notification.type === 'success'
-              ? 'bg-emerald-950/80 text-emerald-200 border-emerald-800'
-              : 'bg-rose-950/80 text-rose-200 border-rose-800'
+              ? 'bg-win/10 text-win border-win/20'
+              : 'bg-loss/10 text-loss border-loss/20'
           }`}
           role="alert"
         >
           <div className="max-w-7xl mx-auto flex items-center gap-2">
             {notification.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-win flex-shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <AlertCircle className="w-4 h-4 text-loss flex-shrink-0" />
             )}
             <span>{notification.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setNotification(null)}
-            className="text-xs opacity-75 hover:opacity-100 font-bold px-2"
+            className="text-[12px] opacity-75 hover:opacity-100 font-bold px-2"
           >
             ×
           </button>
         </div>
       )}
 
-      {/* Main Content Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* If IBM hardware requested but not loaded -> Show Empty State */}
-        {currentSource === 'ibm_hardware' && ibmData === null ? (
-          <EmptyHardwareState
-            onSwitchToAer={() => setCurrentSource('qiskit_aer')}
-            onTriggerImport={() => {
-              const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-              fileInput?.click();
-            }}
-          />
-        ) : currentContext && currentCountItem ? (
-          <>
-            {/* Top Row: Magic Grid & Audio Sonification Controls */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: 3x3 Magic Square Interactive Grid */}
-              <div className="lg:col-span-5 space-y-4">
-                <MagicGrid
+      <main className="flex-1 max-w-[1100px] w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <Tabs defaultValue="play" className="w-full">
+          <TabsList className="mb-6 bg-surface border border-hairline">
+            <TabsTrigger value="play">Play</TabsTrigger>
+            <TabsTrigger value="results">Results</TabsTrigger>
+            <TabsTrigger value="classical">Why classical fails</TabsTrigger>
+            <TabsTrigger value="sources">Sources and limits</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="play" className="space-y-6">
+            {currentSource === 'ibm_hardware' && ibmData === null ? (
+              <EmptyHardwareState
+                onSwitchToAer={() => setCurrentSource('qiskit_aer')}
+                onTriggerImport={() => {
+                  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                  fileInput?.click();
+                }}
+              />
+            ) : currentDataset ? (
+              <GuidedRound
+                dataset={currentDataset}
+                audioEngine={audioEngine}
+                activeStepEvent={activeStepEvent}
+                onSetActiveStepEvent={setActiveStepEvent}
+                selectedRow={selectedRow}
+                selectedCol={selectedCol}
+                onSelectContext={(r, c) => {
+                  handleStop();
+                  setSelectedRow(r);
+                  setSelectedCol(c);
+                }}
+                onPlayAll={handlePlayAll}
+              />
+            ) : null}
+          </TabsContent>
+
+          <TabsContent value="results" className="space-y-8">
+            {currentDataset && (
+              <>
+                <WinRateChart
+                  contexts={currentDataset.contexts}
                   selectedRow={selectedRow}
                   selectedCol={selectedCol}
                   onSelectContext={(r, c) => {
-                    handleStop();
                     setSelectedRow(r);
                     setSelectedCol(c);
                   }}
-                  activeStepEvent={activeStepEvent}
-                  aliceBits={currentCountItem.alice_bits}
-                  bobBits={currentCountItem.bob_bits}
                 />
-              </div>
-
-              {/* Right Column: Audio Controls & Recorded Outcome Inspector */}
-              <div className="lg:col-span-7 space-y-4">
-                <AudioControls
-                  isPlayingSample={isPlayingSample}
-                  isPlayingAll={isPlayingAll}
-                  onPlaySample={handlePlaySample}
-                  onPlayAll={handlePlayAll}
-                  onStop={handleStop}
-                  volume={volume}
-                  onVolumeChange={(v) => {
-                    setVolume(v);
-                    audioEngine.setVolume(v);
+                <HistoryTable
+                  contexts={currentDataset.contexts}
+                  selectedRow={selectedRow}
+                  selectedCol={selectedCol}
+                  onSelectContext={(r, c) => {
+                    setSelectedRow(r);
+                    setSelectedCol(c);
                   }}
-                  muted={muted}
-                  onToggleMute={() => {
-                    setMuted(!muted);
-                    audioEngine.setMuted(!muted);
-                  }}
-                  activeStepEvent={activeStepEvent}
                 />
+              </>
+            )}
+          </TabsContent>
 
-                <OutcomeView
-                  contextData={currentContext}
-                  activeSampleIndex={sampleIndex}
-                  onSelectSampleIndex={(idx) => setSampleIndex(idx)}
-                  currentCountItem={currentCountItem}
-                />
-              </div>
-            </div>
-
-            {/* Classical Baseline Comparison & Parity Contradiction Proof */}
+          <TabsContent value="classical">
             <ClassicalComparison />
+          </TabsContent>
 
-            {/* Measured Win Rate SVG Chart */}
-            {currentDataset && (
-              <WinRateChart
-                contexts={currentDataset.contexts}
-                selectedRow={selectedRow}
-                selectedCol={selectedCol}
-                onSelectContext={(r, c) => {
-                  setSelectedRow(r);
-                  setSelectedCol(c);
-                }}
-              />
-            )}
-
-            {/* Summary History Table */}
-            {currentDataset && (
-              <HistoryTable
-                contexts={currentDataset.contexts}
-                selectedRow={selectedRow}
-                selectedCol={selectedCol}
-                onSelectContext={(r, c) => {
-                  setSelectedRow(r);
-                  setSelectedCol(c);
-                }}
-              />
-            )}
-          </>
-        ) : null}
-
-        {/* Academic References Panel */}
-        <SourcesPanel />
+          <TabsContent value="sources" className="space-y-6">
+            <SourcesPanel dataset={currentDataset} />
+          </TabsContent>
+        </Tabs>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="border-t border-hairline bg-surface py-6 text-center text-[14px] text-muted">
+        <div className="max-w-[1100px] mx-auto px-4 flex flex-col items-center gap-2">
           <div>
             <strong>The 8/9 Duet</strong> — Publicly Judgeable Qollab Quantum Hackathon Submission
           </div>
-          <div className="flex items-center gap-4">
-            <span>Vite + React + Web Audio API</span>
-            <span>•</span>
-            <button
-              type="button"
-              onClick={() => setIsAboutOpen(true)}
-              className="text-cyan-400 hover:underline"
-            >
-              Scientific Limitations & About
-            </button>
-          </div>
+          <div>This effort is supported by Qollab & IonQ.</div>
         </div>
       </footer>
 
-      {/* About & Limitations Modal */}
       <ExplainerModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );

@@ -17,7 +17,7 @@ No player receives or accesses the other's prompt or measurement outputs.
 Third bits are reconstructed deterministically via the required algebraic parity.
 """
 
-from typing import List, Tuple
+from typing import List
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 

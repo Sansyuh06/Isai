@@ -241,5 +241,16 @@ Displayed prominently in the web application's About panel:
 
 ---
 
+## 🎨 UI Credits & Dependencies
+
+This project relies on the following MIT-licensed dependencies for its accessible and robust user interface:
+
+- **[Radix UI Primitives](https://www.radix-ui.com/):** Unstyled, accessible components for `Tabs` (`@radix-ui/react-tabs`) and `Dialog` (`@radix-ui/react-dialog`).
+- **[Tailwind CSS](https://tailwindcss.com/):** For utility-first styling and CSS variable token mapping.
+- **[Lucide React](https://lucide.dev/):** For clean, open-source SVG icons.
+- **[Fontsource](https://fontsource.org/):** Self-hosting the IBM Plex Sans and IBM Plex Mono typefaces (`@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono`).
+
+---
+
 ## 📄 License
 MIT License. Built for the Qollab Quantum Hackathon.
