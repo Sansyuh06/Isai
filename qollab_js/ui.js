@@ -32,6 +32,18 @@ function buildCircuit(row, col) {
 }
 
 function submit(circuits, shots) {
+  if (Array.isArray(circuits) && circuits.length > 0) {
+    try {
+      if (typeof pyodide !== 'undefined' && typeof pyodide.toPy === 'function') {
+        circuits = pyodide.toPy(circuits);
+      } else if (circuits[0]?.qubits && typeof circuits[0].qubits.copy === 'function') {
+        const pyList = circuits[0].qubits.copy();
+        pyList.clear();
+        for (const c of circuits) pyList.append(c);
+        circuits = pyList;
+      }
+    } catch (_) {}
+  }
   const num = typeof shots === 'number' ? shots : (shots && shots.shots) || 1000;
   try {
     shots = { shots: num };
@@ -96,13 +108,26 @@ async function run() {
       } catch { /* keep the plain type as diagnostic */ }
       throw new Error(`unexpected job shape: ${shape}`);
     }
-    // get_counts() returns Python dict / list-of-dicts proxies; toJs() yields
-    // Maps for dicts (see the template's note), so normalize both shapes.
-    let all = result.get_counts();
-    if (all && typeof all.toJs === 'function') all = all.toJs();
-    if (all instanceof Map) all = [Object.fromEntries(all)];
-    if (!Array.isArray(all)) all = [all];
-    all = all.map((counts) => (counts instanceof Map ? Object.fromEntries(counts) : counts));
+    let all = null;
+    try {
+      all = result.get_counts();
+      if (all && typeof all.toJs === 'function') all = all.toJs();
+      if (all instanceof Map) all = [Object.fromEntries(all)];
+      if (all && !Array.isArray(all)) all = [all];
+      if (Array.isArray(all)) {
+        all = all.map((counts) => (counts instanceof Map ? Object.fromEntries(counts) : counts));
+      }
+    } catch (_) {}
+    if (!Array.isArray(all) || all.length !== CONTEXTS.length) {
+      const fallback = [];
+      for (let i = 0; i < CONTEXTS.length; i++) {
+        let c = result.get_counts(i);
+        if (c && typeof c.toJs === 'function') c = c.toJs();
+        if (c instanceof Map) c = Object.fromEntries(c);
+        fallback.push(c);
+      }
+      all = fallback;
+    }
     if (all.length !== CONTEXTS.length) {
       throw new Error(`Expected ${CONTEXTS.length} count tables, got ${all.length}`);
     }
