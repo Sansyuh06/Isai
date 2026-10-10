@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MerminPeresDuetResults",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "source_type",
+    "backend_name",
+    "timestamp",
+    "shots_per_context",
+    "contexts",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0.0"]
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["ibm_hardware", "qiskit_aer"]
+    },
+    "backend_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ibm_job_id": {
+      "type": ["string", "null"]
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "shots_per_context": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contexts": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": [
+          "row",
+          "column",
+          "shots",
+          "wins",
+          "win_rate",
+          "alice_parity_valid_count",
+          "bob_parity_valid_count",
+          "shared_cell_match_count",
+          "counts"
+        ],
+        "properties": {
+          "row": { "type": "integer", "minimum": 0, "maximum": 2 },
+          "column": { "type": "integer", "minimum": 0, "maximum": 2 },
+          "shots": { "type": "integer", "minimum": 1 },
+          "wins": { "type": "integer", "minimum": 0 },
+          "win_rate": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "confidence_interval_95": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "alice_parity_valid_count": { "type": "integer" },
+          "bob_parity_valid_count": { "type": "integer" },
+          "shared_cell_match_count": { "type": "integer" },
+          "counts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["alice_bits", "bob_bits", "count", "win"],
+              "properties": {
+                "alice_bits": {
+                  "type": "array",
+                  "items": { "type": "integer", "enum": [0, 1] },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "bob_bits": {
+                  "type": "array",
+                  "items": { "type": "integer", "enum": [0, 1] },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "count": { "type": "integer", "minimum": 1 },
+                "win": { "type": "boolean" },
+                "alice_parity_even": { "type": "boolean" },
+                "bob_parity_odd": { "type": "boolean" },
+                "shared_match": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_shots", "total_wins", "overall_win_rate"],
+      "properties": {
+        "total_shots": { "type": "integer" },
+        "total_wins": { "type": "integer" },
+        "overall_win_rate": { "type": "number" },
+        "confidence_interval_95": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    }
+  }
+}

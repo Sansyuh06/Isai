@@ -1,0 +1,36 @@
+# Node & Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.pytest_cache/
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Environment & Secrets (Zero tolerance for tokens)
+.env
+.env.*
+*.env
+*.token
+*secret*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
