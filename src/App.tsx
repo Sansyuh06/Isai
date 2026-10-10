@@ -6,6 +6,7 @@ import { audioEngine, VisualStepEvent } from './audio/synth';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Header } from './components/Header';
+import { Hero } from './components/Hero';
 import { GuidedRound } from './components/GuidedRound';
 import { ActiveCircuit } from './components/ActiveCircuit';
 import { ClassicalComparison } from './components/ClassicalComparison';
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
   const [aerData, setAerData] = useState<MerminPeresDataset>(defaultAerDataset as unknown as MerminPeresDataset);
   const [ibmData, setIbmData] = useState<MerminPeresDataset | null>(null);
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
+  const [activeTab, setActiveTab] = useState<string>('play');
 
   const [selectedRow, setSelectedRow] = useState<number>(0);
   const [selectedCol, setSelectedCol] = useState<number>(0);
@@ -145,8 +147,18 @@ export const App: React.FC = () => {
         </div>
       )}
 
+      <Hero 
+        dataset={currentDataset}
+        onHearDuet={() => {
+          setActiveTab('play');
+          handlePlayAll();
+        }}
+        onTour={() => alert('Tour feature coming soon!')}
+        onBeatClassical={() => setActiveTab('classical')}
+      />
+
       <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8">
-        <Tabs defaultValue="play" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 bg-surface border border-hairline">
             <TabsTrigger value="play">Play</TabsTrigger>
             <TabsTrigger value="results">Results</TabsTrigger>
