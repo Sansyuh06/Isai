@@ -57,13 +57,13 @@ export const ActiveCircuit: React.FC<Props> = ({ row, col }) => {
   // CSS Grid: 4 rows (qubits), N columns (time steps)
   
   return (
-    <div className="bg-paper border border-hairline rounded-[10px] p-6 shadow-sm overflow-x-auto w-full">
+    <div className="bg-paper border border-hairline rounded-[10px] p-4 sm:p-6 shadow-sm overflow-x-auto w-full max-w-full">
       <div className="mb-4">
         <h3 className="text-[16px] font-bold text-ink">Active Quantum Circuit</h3>
-        <p className="text-[12px] text-muted">Showing the exact Qiskit circuit evaluated for Row {row + 1}, Col {col + 1}</p>
+        <p className="text-[12px] text-muted">Showing the exact Qiskit circuit evaluated for Row {row + 1}, Col {col + 1} (scroll horizontally on mobile)</p>
       </div>
 
-      <div className="relative min-w-[600px] h-[250px] mt-6">
+      <div className="relative min-w-[580px] h-[250px] mt-4">
         
         {/* Wires */}
         <div className="absolute top-[20px] left-[40px] right-[20px] h-[2px] bg-hairline"></div>

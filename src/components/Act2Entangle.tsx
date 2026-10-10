@@ -11,12 +11,30 @@ export const Act2Entangle: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [lastResult, setLastResult] = useState<{ aliceBits: [number, number, number]; bobBits: [number, number, number]; win: boolean } | null>(null);
 
-  // Cumulative tracking of all 9 contexts
+  const [hasPredicted, setHasPredicted] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('isai_predicted_surprise') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [predictionChoice, setPredictionChoice] = useState<string | null>(null);
+
   const [cumulativeContexts, setCumulativeContexts] = useState<Record<string, {
     aliceBits: [number, number, number];
     bobBits: [number, number, number];
     win: boolean;
   }>>({});
+
+  const handleMakePrediction = (choice: string) => {
+    setPredictionChoice(choice);
+    try {
+      localStorage.setItem('isai_predicted_surprise', 'true');
+    } catch {
+      // Graceful fallback
+    }
+    setHasPredicted(true);
+  };
 
   const runSingle = async (r: number, c: number) => {
     if (isPlaying) return;
@@ -115,6 +133,50 @@ export const Act2Entangle: React.FC = () => {
           Alice and Bob measure their halves of two entangled Bell pairs locally. Hear the 9-beat loop resonate in <strong>pure unison chords</strong> with zero clashes.
         </p>
       </div>
+
+      {/* One-time 'Predict the Surprise' prompt before first run */}
+      {!hasPredicted && (
+        <div className="glass-card p-6 border-win/30 bg-win/5 w-full max-w-xl text-center space-y-4 animate-fade-in-up">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-win block">
+            Pre-Flight Hypothesis
+          </span>
+          <h3 className="text-lg font-display font-bold text-ink">
+            What will happen when Alice and Bob use shared entanglement?
+          </h3>
+          <p className="text-xs text-muted">
+            In Act 1, classical physics made 9/9 mathematically impossible (parity contradiction). Before running the circuit, predict what quantum physics allows:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => handleMakePrediction('still_8_9')}
+              className="p-3 rounded-lg bg-surface border border-hairline hover:border-ink transition-all"
+            >
+              Still capped at 8/9
+            </button>
+            <button
+              type="button"
+              onClick={() => handleMakePrediction('perfect_9_9')}
+              className="p-3 rounded-lg bg-surface border border-win/40 text-win hover:bg-win/10 transition-all"
+            >
+              Wins 9/9 (100%)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleMakePrediction('worse_random')}
+              className="p-3 rounded-lg bg-surface border border-hairline hover:border-ink transition-all"
+            >
+              Worse than 8/9
+            </button>
+          </div>
+        </div>
+      )}
+
+      {hasPredicted && predictionChoice && (
+        <div className="text-xs font-mono text-muted text-center -mt-6">
+          Your prediction: <strong className="text-ink">{predictionChoice === 'perfect_9_9' ? 'Wins 9/9 (100%)' : predictionChoice === 'still_8_9' ? 'Still capped at 8/9' : 'Worse'}</strong>. Test the circuit below to hear the verdict!
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8 w-full items-start">
         {/* Left: Magic Grid & Loop Trigger */}

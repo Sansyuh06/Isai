@@ -54,6 +54,13 @@ export const SourcesPanel: React.FC<Props> = ({ dataset }) => {
             </dd>
           </div>
         </dl>
+
+        {dataset?.source_type === 'ibm_hardware' && (
+          <div className="mt-4 p-3 bg-bob/10 border border-bob/30 rounded-lg text-xs leading-relaxed text-ink">
+            <strong>Provenance Notice:</strong> Imported IBM dataset — not independently verified by this static app. 
+            Job ID: <code className="font-mono">{dataset.ibm_job_id || 'N/A'}</code> on backend <code className="font-mono">{dataset.backend_name}</code>. Schema validation confirms payload format only; physical execution on QPU was performed externally.
+          </div>
+        )}
       </div>
 
       <div className="bg-surface border border-hairline rounded-[10px] p-5 shadow-sm">

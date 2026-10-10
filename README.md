@@ -6,24 +6,20 @@
 [![Frontend Build](https://img.shields.io/badge/Vite%20%2B%20React%2019-Passed-success)](https://vitejs.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Typecheck-blue)](https://www.typescriptlang.org/)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.5.1%20%2B%20Aer-purple)](https://qiskit.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-14%20Passed-green)](https://vitest.dev/)
-[![Pytest](https://img.shields.io/badge/Pytest-23%20Passed-green)](https://docs.pytest.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-26%20Passed-green)](https://vitest.dev/)
+[![Pytest](https://img.shields.io/badge/Pytest-24%20Passed-green)](https://docs.pytest.org/)
 [![Qollab Compliant](https://img.shields.io/badge/Qollab%20Platform-Zero%20Secrets%20%7C%20Static%20Only-teal)](#qollab-compliance--security-guarantee)
 
 ---
 
 ## 🌟 Executive Summary
 
-**Isai** (*Isai*, meaning "music" or "melody" in Tamil, also known as *The 8/9 Duet*) sonifies quantum contextuality and pseudo-telepathy through an interactive, browser-native audiovisual experience. 
-
-In classical game theory, two players (Alice and Bob) playing the Mermin–Peres Magic Square game without communication are mathematically bounded by a maximum win probability of **8/9 (≈ 88.89%)**. However, by sharing two entangled Bell pairs $|\Phi^+\rangle$ and performing compatible local Pauli measurements, Alice and Bob can achieve a theoretical win rate of **9/9 (100%)** without communicating during the round.
-
-This project delivers:
-1. **Dynamic, Audio-First Web App (Vite + React + TypeScript + Web Audio API)**: Zero backend, zero secrets, zero live external API calls. Real-time synthesized stereo sonification maps quantum measurement outcomes to musical phrases.
-2. **Authentic Data Integrity**: Clearly distinguishes between certified Qiskit Aer simulation runs and physical IBM Quantum hardware runs. **Never substitutes or invents hardware data.**
-3. **Rigorous Quantum Circuit Implementation (Qiskit 2.5)**: Clean 4-qubit circuit with genuine Bell state preparation, Clifford basis rotations, and strictly local classical decoding.
-4. **Offline IBM QPU Capture Tool**: Kept outside the web bundle, enabling local-only batch submission via the official `QiskitRuntimeService` and `SamplerV2` with zero token leakage.
-5. **Complete Test Suite**: Exhaustive verification of algebraic commutation, Bell pair correlations, classical deterministic policies, schema integrity, and acoustic bit-to-pitch mappings.
+**Isai** (*Isai*, meaning "music" or "melody" in Tamil, also known as *The 8/9 Duet*) sonifies quantum contextuality and pseudo-telepathy through an interactive, browser-native audiovisual experience structured into three progressive acts and challenge modes:
+1. **Act 1: Break It** — An unfilled 12-free-bit classical strategy puzzle where players discover the unavoidable 8/9 parity ceiling and hear the resulting clash.
+2. **Act 2: Entangle It** — A reproducible 4-qubit TypeScript statevector simulation with exact Qiskit probability parity (< $10^{-9}$), proving 9/9 unison without communication.
+3. **Act 3: Corrupt It** — Circuit-level stochastic Pauli depolarizing noise modeling gate decoherence with an interactive crossover curve and 95% Wilson confidence intervals.
+4. **30-Round Survival Gauntlet** — Seeded uniform challenge testing whether classical (2.92% theoretical survival) or quantum (100% ideal) strategies survive 30 referee prompts.
+5. **Classical Communication Mode** — Compares 1-message classical signaling to quantum pseudo-telepathy, demonstrating why entanglement is fundamentally not signaling.
 
 ---
 
@@ -31,8 +27,8 @@ This project delivers:
 
 | Criterion | Implementation in Isai |
 | :--- | :--- |
-| **Novelty & Creativity** | Transforms abstract operator contextuality into a musical duet. Left/Right stereo panning allows the ear to hear bipartite entanglement; matching crossing bits resonate in pure unison, while classical or noise-induced defects produce harsh semitone dissonance. |
-| **Technical Execution** | Rigorous automated verification across both Python (`pytest`, 23 passed) and TypeScript (`vitest`, 19 passed), including golden statevector probability parity against Qiskit at $10^{-9}$ tolerance and exhaustive 4,096-strategy classical search. Pure Web Audio API synthesis (no external audio assets, no autoplay). Custom plain SVG charts with 95% Wilson confidence intervals. Strict TypeScript type-checking. |
+| **Novelty & Creativity** | Transforms abstract operator contextuality into a musical duet. Left/Right stereo panning allows the ear to hear bipartite entanglement; matching crossing bits resonate in pure unison, while classical or noise-induced defects produce distinct semitone dissonance. |
+| **Technical Execution** | 50 automated tests passing across Python (`pytest`, 24 passed) and TypeScript (`vitest`, 26 passed), including golden statevector probability parity against Qiskit at $10^{-9}$ numerical tolerance, reproducible PRNG seeding (`mulberry32`), and exhaustive 4,096-strategy classical search with exact histogram verification. Pure Web Audio API synthesis (no external audio assets, no autoplay). Custom plain SVG charts with 95% Wilson confidence intervals. Strict TypeScript type-checking. |
 | **Impact Potential** | An intuitive educational portal for university quantum information courses, hackathon judges, and researchers to understand non-locality, Mermin-Peres squares, and contextuality without opaque mathematics. |
 | **Documentation Quality** | Comprehensive documentation, formal mathematical proofs, documented JSON schema, step-by-step reproduction instructions, and clear scientific scope limitations. |
 
