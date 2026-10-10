@@ -10,6 +10,8 @@ import { Hero } from './components/Hero';
 import { GuidedRound } from './components/GuidedRound';
 import { ActiveCircuit } from './components/ActiveCircuit';
 import { ClassicalPuzzle } from './components/ClassicalPuzzle';
+import { Act2Entangle } from './components/Act2Entangle';
+import { Act3Corrupt } from './components/Act3Corrupt';
 import { WinRateChart } from './components/WinRateChart';
 import { HistoryTable } from './components/HistoryTable';
 import { EmptyHardwareState } from './components/EmptyHardwareState';
@@ -21,7 +23,7 @@ export const App: React.FC = () => {
   const [aerData, setAerData] = useState<MerminPeresDataset>(defaultAerDataset as unknown as MerminPeresDataset);
   const [ibmData, setIbmData] = useState<MerminPeresDataset | null>(null);
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
-  const [activeTab, setActiveTab] = useState<string>('play');
+  const [activeTab, setActiveTab] = useState<string>('act1');
   const [view, setView] = useState<'landing' | 'app'>('landing');
 
   const [selectedRow, setSelectedRow] = useState<number>(0);
@@ -154,26 +156,38 @@ export const App: React.FC = () => {
           dataset={currentDataset}
           onHearDuet={() => {
             setView('app');
-            setActiveTab('play');
-            handlePlayAll();
+            setActiveTab('act2');
           }}
           onTour={() => alert('Tour feature coming soon!')}
           onBeatClassical={() => {
             setView('app');
-            setActiveTab('classical');
+            setActiveTab('act1');
           }}
         />
       ) : (
         <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 bg-surface border border-hairline">
-            <TabsTrigger value="play">Play</TabsTrigger>
-            <TabsTrigger value="results">Results</TabsTrigger>
-            <TabsTrigger value="classical">Why classical fails</TabsTrigger>
-            <TabsTrigger value="sources">Sources and limits</TabsTrigger>
+          <TabsList className="mb-6 bg-surface border border-hairline flex flex-wrap h-auto">
+            <TabsTrigger value="act1">Act 1: Break it</TabsTrigger>
+            <TabsTrigger value="act2">Act 2: Entangle it</TabsTrigger>
+            <TabsTrigger value="act3">Act 3: Corrupt it</TabsTrigger>
+            <TabsTrigger value="tutorial">Why does this happen?</TabsTrigger>
+            <TabsTrigger value="results">Data & Provenance</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="play" className="space-y-6">
+          <TabsContent value="act1">
+            <ClassicalPuzzle />
+          </TabsContent>
+
+          <TabsContent value="act2">
+            <Act2Entangle />
+          </TabsContent>
+
+          <TabsContent value="act3">
+            <Act3Corrupt ibmDataset={ibmData} />
+          </TabsContent>
+
+          <TabsContent value="tutorial" className="space-y-6">
             {currentSource === 'ibm_hardware' && ibmData === null ? (
               <EmptyHardwareState
                 onSwitchToAer={() => setCurrentSource('qiskit_aer')}
@@ -229,13 +243,6 @@ export const App: React.FC = () => {
                 />
               </>
             )}
-          </TabsContent>
-
-          <TabsContent value="classical">
-            <ClassicalPuzzle />
-          </TabsContent>
-
-          <TabsContent value="sources" className="space-y-6">
             <SourcesPanel dataset={currentDataset} />
           </TabsContent>
         </Tabs>
