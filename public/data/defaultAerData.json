@@ -3,7 +3,7 @@
   "source_type": "qiskit_aer",
   "backend_name": "AerSimulator",
   "ibm_job_id": null,
-  "timestamp": "2026-10-10T10:47:07.398689+00:00",
+  "timestamp": "2026-10-10T10:57:11.358817+00:00",
   "shots_per_context": 1000,
   "contexts": [
     {
@@ -28,10 +28,10 @@
           ],
           "bob_bits": [
             0,
-            1,
-            0
+            0,
+            1
           ],
-          "count": 115,
+          "count": 137,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -48,7 +48,7 @@
             1,
             0
           ],
-          "count": 132,
+          "count": 125,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -56,47 +56,13 @@
         },
         {
           "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 112,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
+            0,
             0,
             0
           ],
-          "count": 131,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
           "bob_bits": [
-            1,
             0,
+            1,
             0
           ],
           "count": 128,
@@ -107,33 +73,50 @@
         },
         {
           "alice_bits": [
-            0,
             1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 118,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
+            1,
             0
           ],
           "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
             0,
+            0
+          ],
+          "count": 104,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
             0,
             1
           ],
-          "count": 125,
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 127,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -150,7 +133,24 @@
             1,
             1
           ],
-          "count": 139,
+          "count": 129,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 124,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -174,74 +174,6 @@
       "counts": [
         {
           "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 137,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 141,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 124,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 116,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
             0,
             0,
             0
@@ -250,59 +182,127 @@
             0,
             1,
             0
-          ],
-          "count": 116,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 127,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 118,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
           ],
           "count": 121,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 130,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 130,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 117,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 122,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 122,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 132,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -327,125 +327,6 @@
         {
           "alice_bits": [
             0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 137,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 111,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 113,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 135,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 124,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 108,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 136,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
             0,
             0
           ],
@@ -453,293 +334,6 @@
             0,
             1,
             0
-          ],
-          "count": 136,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        }
-      ]
-    },
-    {
-      "row": 1,
-      "column": 0,
-      "shots": 1000,
-      "wins": 1000,
-      "win_rate": 1.0,
-      "confidence_interval_95": [
-        0.9962,
-        1.0
-      ],
-      "alice_parity_valid_count": 1000,
-      "bob_parity_valid_count": 1000,
-      "shared_cell_match_count": 1000,
-      "counts": [
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 117,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 126,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 125,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 134,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 130,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 115,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 127,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 126,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        }
-      ]
-    },
-    {
-      "row": 1,
-      "column": 1,
-      "shots": 1000,
-      "wins": 1000,
-      "win_rate": 1.0,
-      "confidence_interval_95": [
-        0.9962,
-        1.0
-      ],
-      "alice_parity_valid_count": 1000,
-      "bob_parity_valid_count": 1000,
-      "shared_cell_match_count": 1000,
-      "counts": [
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 122,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 133,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 118,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 115,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 136,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 132,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
           ],
           "count": 119,
           "win": true,
@@ -758,7 +352,413 @@
             1,
             0
           ],
+          "count": 110,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 97,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
           "count": 125,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 141,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 143,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 139,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        }
+      ]
+    },
+    {
+      "row": 1,
+      "column": 0,
+      "shots": 1000,
+      "wins": 1000,
+      "win_rate": 1.0,
+      "confidence_interval_95": [
+        0.9962,
+        1.0
+      ],
+      "alice_parity_valid_count": 1000,
+      "bob_parity_valid_count": 1000,
+      "shared_cell_match_count": 1000,
+      "counts": [
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 134,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 120,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 99,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 116,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 131,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 138,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 136,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        }
+      ]
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "shots": 1000,
+      "wins": 1000,
+      "win_rate": 1.0,
+      "confidence_interval_95": [
+        0.9962,
+        1.0
+      ],
+      "alice_parity_valid_count": 1000,
+      "bob_parity_valid_count": 1000,
+      "shared_cell_match_count": 1000,
+      "counts": [
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 150,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 124,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 106,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 129,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 113,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -787,11 +787,11 @@
             0
           ],
           "bob_bits": [
+            1,
             0,
-            0,
-            1
+            0
           ],
-          "count": 109,
+          "count": 111,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -808,75 +808,7 @@
             1,
             1
           ],
-          "count": 120,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 142,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 140,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 113,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 132,
+          "count": 129,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -893,7 +825,24 @@
             1,
             0
           ],
-          "count": 143,
+          "count": 121,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 130,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -910,7 +859,58 @@
             0,
             0
           ],
-          "count": 101,
+          "count": 116,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 131,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 131,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 131,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -939,11 +939,45 @@
             0
           ],
           "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 119,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 127,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
             0,
             0,
             1
           ],
-          "count": 120,
+          "count": 99,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -952,47 +986,13 @@
         {
           "alice_bits": [
             0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 123,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 114,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
             1,
             1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
           ],
           "count": 134,
           "win": true,
@@ -1011,7 +1011,7 @@
             1,
             1
           ],
-          "count": 133,
+          "count": 140,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1022,6 +1022,40 @@
             0,
             1,
             1
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 138,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 118,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
           ],
           "bob_bits": [
             1,
@@ -1029,40 +1063,6 @@
             0
           ],
           "count": 125,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 128,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 123,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1112,75 +1112,7 @@
             1,
             1
           ],
-          "count": 124,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
-            0,
-            1,
-            0
-          ],
-          "count": 115,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 125,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 125,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            1,
-            1
-          ],
-          "bob_bits": [
-            0,
-            0,
-            1
-          ],
-          "count": 127,
+          "count": 153,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1197,7 +1129,41 @@
             0,
             1
           ],
-          "count": 129,
+          "count": 105,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 118,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 134,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1214,7 +1180,41 @@
             0,
             0
           ],
-          "count": 130,
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            1,
+            0
+          ],
+          "count": 126,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            1,
+            1
+          ],
+          "bob_bits": [
+            1,
+            1,
+            1
+          ],
+          "count": 113,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1243,62 +1243,11 @@
             1
           ],
           "bob_bits": [
-            1,
-            1,
-            1
-          ],
-          "count": 125,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            0,
-            0,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 110,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            0,
-            1
-          ],
-          "bob_bits": [
             0,
             0,
             1
           ],
-          "count": 141,
-          "win": true,
-          "alice_parity_even": true,
-          "bob_parity_odd": true,
-          "shared_match": true
-        },
-        {
-          "alice_bits": [
-            1,
-            1,
-            0
-          ],
-          "bob_bits": [
-            1,
-            0,
-            0
-          ],
-          "count": 138,
+          "count": 101,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1315,7 +1264,7 @@
             1,
             0
           ],
-          "count": 125,
+          "count": 128,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1328,11 +1277,45 @@
             1
           ],
           "bob_bits": [
-            0,
-            0,
+            1,
+            1,
             1
           ],
-          "count": 136,
+          "count": 151,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            0,
+            0,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 120,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            1,
+            0
+          ],
+          "bob_bits": [
+            1,
+            0,
+            0
+          ],
+          "count": 116,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1349,7 +1332,7 @@
             1,
             1
           ],
-          "count": 115,
+          "count": 126,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
@@ -1366,7 +1349,24 @@
             1,
             0
           ],
-          "count": 110,
+          "count": 128,
+          "win": true,
+          "alice_parity_even": true,
+          "bob_parity_odd": true,
+          "shared_match": true
+        },
+        {
+          "alice_bits": [
+            1,
+            0,
+            1
+          ],
+          "bob_bits": [
+            0,
+            0,
+            1
+          ],
+          "count": 130,
           "win": true,
           "alice_parity_even": true,
           "bob_parity_odd": true,
