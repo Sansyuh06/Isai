@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { VisualStepEvent } from '../audio/synth';
 import { NOTE_NAMES } from '../audio/notes';
 
@@ -9,8 +9,8 @@ export const OBSERVABLE_MATRIX = [
 ];
 
 interface Props {
-  selectedRow: number; // 0, 1, 2
-  selectedCol: number; // 0, 1, 2
+  selectedRow: number;
+  selectedCol: number;
   onSelectContext: (row: number, col: number) => void;
   activeStepEvent: VisualStepEvent | null;
   aliceBits?: [number, number, number] | number[];
@@ -25,158 +25,159 @@ export const MagicGrid: React.FC<Props> = ({
   aliceBits,
   bobBits
 }) => {
+  const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number } | null>(null);
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full max-w-md bg-surface rounded-[10px] p-5 border border-hairline shadow-sm">
-        {/* Column Headers (Bob's Choices) */}
-        <div className="grid grid-cols-4 gap-2 mb-2 items-center text-center">
-          <div className="text-[12px] font-semibold text-muted tracking-wider">
-            Alice \ Bob
-          </div>
-          {[0, 1, 2].map((c) => {
-            const isColSelected = selectedCol === c;
-            return (
-              <button
-                key={`col-head-${c}`}
-                type="button"
-                onClick={() => onSelectContext(selectedRow, c)}
-                className={`py-1.5 px-2 rounded-[6px] text-[12px] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
-                  isColSelected
-                    ? 'bg-bob/10 text-bob-text border border-bob/20'
-                    : 'text-muted hover:text-ink hover:bg-paper border border-transparent'
-                }`}
-                title={`Select Column ${c + 1} (Bob)`}
-                aria-label={`Select Column ${c + 1} for Bob`}
-              >
-                Col {c + 1}
-              </button>
-            );
-          })}
-        </div>
+    <div className="flex flex-col items-center w-full max-w-[600px] mx-auto">
+      {/* 4x4 Grid including headers */}
+      <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-3 w-full">
+        
+        {/* Top-left empty space */}
+        <div className="w-[80px]"></div>
 
-        {/* 3x3 Grid Rows */}
-        <div className="space-y-2">
-          {[0, 1, 2].map((r) => {
-            const isRowSelected = selectedRow === r;
-            return (
-              <div key={`row-${r}`} className="grid grid-cols-4 gap-2 items-center">
-                {/* Row Header (Alice's Choice) */}
-                <button
-                  type="button"
-                  onClick={() => onSelectContext(r, selectedCol)}
-                  className={`py-3 px-2 rounded-[6px] text-[12px] font-semibold text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
-                    isRowSelected
-                      ? 'bg-alice/10 text-alice-text border border-alice/20'
-                      : 'text-muted hover:text-ink hover:bg-paper border border-transparent'
-                  }`}
-                  title={`Select Row ${r + 1} (Alice)`}
-                  aria-label={`Select Row ${r + 1} for Alice`}
-                >
-                  Row {r + 1}
-                </button>
-
-                {/* 3 Cells in Row r */}
-                {[0, 1, 2].map((c) => {
-                  const isCrossing = selectedRow === r && selectedCol === c;
-                  const inRow = selectedRow === r;
-                  const inCol = selectedCol === c;
-
-                  const isAliceActive = activeStepEvent && activeStepEvent.aliceRow === r && activeStepEvent.aliceCol === c;
-                  const isBobActive = activeStepEvent && activeStepEvent.bobRow === r && activeStepEvent.bobCol === c;
-                  const isAudioActive = isAliceActive || isBobActive;
-
-                  const noteBase = NOTE_NAMES[r][c];
-                  
-                  const aliceSharedBit = aliceBits ? aliceBits[c] : undefined;
-                  const bobSharedBit = bobBits ? bobBits[r] : undefined;
-                  const sharedMatch = aliceSharedBit !== undefined && bobSharedBit !== undefined && aliceSharedBit === bobSharedBit;
-
-                  if (isCrossing) {
-                    return (
-                      <button
-                        key={`cell-${r}-${c}`}
-                        type="button"
-                        onClick={() => onSelectContext(r, c)}
-                        className={`relative overflow-hidden flex flex-col items-center justify-center rounded-[6px] border border-ink min-h-[76px] transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 ${
-                          isAudioActive ? 'scale-110 shadow-lg z-10' : ''
-                        }`}
-                        aria-label={`Crossing Cell (${r + 1}, ${c + 1}): Observable ${OBSERVABLE_MATRIX[r][c]}, ${sharedMatch ? 'Match' : 'Mismatch'}`}
-                      >
-                        {/* Split background */}
-                        <div className="absolute inset-0 z-0 flex">
-                           {sharedMatch ? (
-                             <div className="w-full h-full bg-win/20"></div>
-                           ) : (
-                             <div className="w-full h-full relative">
-                                <div className="absolute inset-0 bg-alice/10" style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }}></div>
-                                <div className="absolute inset-0 bg-bob/10" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}></div>
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none transform -rotate-45">
-                                  <div className="w-[150%] h-[2px] bg-surface"></div>
-                                </div>
-                             </div>
-                           )}
-                        </div>
-                        <div className="relative z-10 flex flex-col items-center">
-                          <span className="font-mono text-[16px] font-bold tracking-tight text-ink">
-                            {OBSERVABLE_MATRIX[r][c]}
-                          </span>
-                          <span className="text-[14px] text-ink font-mono mt-1 font-bold">
-                            {sharedMatch ? '=' : '≠'}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={`cell-${r}-${c}`}
-                      type="button"
-                      onClick={() => onSelectContext(r, c)}
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-[6px] border transition-all duration-150 min-h-[76px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ${
-                        inRow
-                          ? 'bg-alice/5 border-alice/20 hover:border-alice/30'
-                          : inCol
-                          ? 'bg-bob/5 border-bob/20 hover:border-bob/30'
-                          : 'bg-surface border-hairline hover:bg-paper'
-                      } ${
-                        isAliceActive ? 'bg-alice text-surface scale-105 shadow-md border-alice z-10 transition-transform duration-75' : ''
-                      } ${
-                        isBobActive ? 'bg-bob text-surface scale-105 shadow-md border-bob z-10 transition-transform duration-75' : ''
-                      }`}
-                      aria-label={`Cell (${r + 1}, ${c + 1}): Observable ${OBSERVABLE_MATRIX[r][c]}`}
-                    >
-                      <span className={`font-mono text-[16px] font-bold tracking-tight ${isAudioActive ? 'text-surface' : 'text-ink'}`}>
-                        {OBSERVABLE_MATRIX[r][c]}
-                      </span>
-                      <span className={`text-[12px] font-mono mt-1 ${isAudioActive ? 'text-surface/80' : 'text-muted'}`}>
-                        {noteBase}
-                      </span>
-                    </button>
-                  );
-                })}
+        {/* Column Headers (Bob) */}
+        {[0, 1, 2].map(c => {
+          const isColSelected = selectedCol === c;
+          return (
+            <button
+              key={`col-${c}`}
+              onClick={() => onSelectContext(selectedRow, c)}
+              className={`group relative flex flex-col items-center py-3 rounded-[12px] font-bold text-[14px] transition-all
+                ${isColSelected ? 'bg-bob/15 text-bob-text shadow-[0_0_15px_rgba(232,176,74,0.15)]' : 'text-muted hover:text-ink hover:bg-surface/50'}
+              `}
+            >
+              Col {c + 1}
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[10px] uppercase tracking-widest text-bob-text bg-bob/10 px-2 py-1 rounded">
+                Bob sees this
               </div>
-            );
-          })}
-        </div>
+            </button>
+          );
+        })}
 
-        {/* Legend */}
-        <div className="mt-5 pt-4 border-t border-hairline flex items-center justify-between text-[12px] text-muted">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-[2px] bg-alice/10 border border-alice/20"></span>
-            <span>Alice</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-[2px] bg-bob/10 border border-bob/20"></span>
-            <span>Bob</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 border border-ink flex items-center justify-center overflow-hidden relative">
-               <div className="absolute inset-0 bg-alice/10" style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }}></div>
-               <div className="absolute inset-0 bg-bob/10" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}></div>
-            </span>
-            <span className="font-medium text-ink">Shared cell</span>
-          </div>
+        {/* Rows */}
+        {[0, 1, 2].map(r => {
+          const isRowSelected = selectedRow === r;
+          
+          return (
+            <React.Fragment key={`row-${r}`}>
+              {/* Row Header (Alice) */}
+              <button
+                onClick={() => onSelectContext(r, selectedCol)}
+                className={`group relative flex items-center justify-center h-full min-h-[96px] rounded-[12px] font-bold text-[14px] transition-all
+                  ${isRowSelected ? 'bg-alice/15 text-alice-text shadow-[0_0_15px_rgba(111,144,255,0.15)]' : 'text-muted hover:text-ink hover:bg-surface/50'}
+                `}
+              >
+                Row {r + 1}
+                <div className="absolute -left-28 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[10px] uppercase tracking-widest text-alice-text bg-alice/10 px-2 py-1 rounded">
+                  Alice sees this
+                </div>
+              </button>
+
+              {/* Grid Cells */}
+              {[0, 1, 2].map(c => {
+                const isCrossing = selectedRow === r && selectedCol === c;
+                const inRow = selectedRow === r;
+                const inCol = selectedCol === c;
+                
+                const isAliceActive = activeStepEvent && activeStepEvent.aliceRow === r && activeStepEvent.aliceCol === c;
+                const isBobActive = activeStepEvent && activeStepEvent.bobRow === r && activeStepEvent.bobCol === c;
+                
+                const noteBase = NOTE_NAMES[r][c];
+                const observable = OBSERVABLE_MATRIX[r][c];
+                
+                const aliceSharedBit = aliceBits ? aliceBits[c] : undefined;
+                const bobSharedBit = bobBits ? bobBits[r] : undefined;
+                const matchState = (aliceSharedBit !== undefined && bobSharedBit !== undefined) 
+                  ? (aliceSharedBit === bobSharedBit ? 'match' : 'mismatch') 
+                  : null;
+
+                // Beam styles
+                let cellStyle = "glass-card hover:bg-surface/50 transition-all duration-300 relative overflow-hidden ";
+                
+                if (isCrossing) {
+                  // Crossing cell styling
+                  if (matchState === 'match' && activeStepEvent?.isShared) {
+                    cellStyle += "bg-win text-paper shadow-[0_0_30px_rgba(91,227,168,0.5)] scale-110 z-20 border-transparent ";
+                  } else if (matchState === 'mismatch' && activeStepEvent?.isShared) {
+                    cellStyle += "bg-loss text-paper shadow-[0_0_30px_rgba(255,92,108,0.5)] scale-110 z-20 border-transparent animate-[shake_0.5s_cubic-bezier(.36,.07,.19,.97)_both] ";
+                  } else {
+                    // Split diagonal gradient when waiting
+                    cellStyle += "bg-gradient-to-br from-alice/20 via-surface to-bob/20 border-ink/30 z-10 ";
+                  }
+                } else if (inRow) {
+                  cellStyle += "bg-alice/5 border-alice/10 ";
+                  if (isAliceActive) cellStyle += "bg-alice/40 shadow-[0_0_20px_rgba(111,144,255,0.4)] scale-105 z-20 ";
+                } else if (inCol) {
+                  cellStyle += "bg-bob/5 border-bob/10 ";
+                  if (isBobActive) cellStyle += "bg-bob/40 shadow-[0_0_20px_rgba(232,176,74,0.4)] scale-105 z-20 ";
+                } else {
+                  cellStyle += "opacity-50 hover:opacity-100 ";
+                }
+
+                return (
+                  <button
+                    key={`cell-${r}-${c}`}
+                    onClick={() => onSelectContext(r, c)}
+                    onMouseEnter={() => setHoveredCell({ r, c })}
+                    onMouseLeave={() => setHoveredCell(null)}
+                    className={`flex flex-col items-center justify-center min-h-[96px] rounded-[16px] outline-none focus-visible:ring-2 focus-visible:ring-ink ${cellStyle}`}
+                  >
+                    {/* Ripple effect on active */}
+                    {(isAliceActive || isBobActive || activeStepEvent?.isShared && isCrossing) && (
+                      <span className="absolute inset-0 rounded-full animate-ping opacity-20 bg-current"></span>
+                    )}
+
+                    {/* Crossing Content */}
+                    {isCrossing && matchState && activeStepEvent?.step === 3 ? (
+                      <div className="text-[40px] font-bold leading-none font-sans mix-blend-plus-lighter">
+                        {matchState === 'match' ? '=' : '≠'}
+                      </div>
+                    ) : (
+                      <>
+                        <span className={`font-mono text-[18px] font-bold tracking-tight z-10 ${
+                          isCrossing ? 'text-ink' : inRow ? 'text-alice-text' : inCol ? 'text-bob-text' : 'text-ink'
+                        }`}>
+                          {observable}
+                        </span>
+                        
+                        <div className="flex items-center gap-1.5 mt-2 opacity-80 z-10">
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                          <span className="text-[13px] font-mono">{noteBase}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Hover tooltip */}
+                    {hoveredCell?.r === r && hoveredCell?.c === c && !isCrossing && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[180px] p-3 bg-surface border border-hairline rounded-[8px] shadow-xl z-50 pointer-events-none animate-fade-in-up">
+                        <div className="text-[12px] font-bold mb-1">{observable}</div>
+                        <div className="text-[11px] text-muted space-y-1">
+                          <div className="flex justify-between"><span>Bit 0 (Even)</span><span className="font-mono">{noteBase}</span></div>
+                          <div className="flex justify-between"><span>Bit 1 (Odd)</span><span className="font-mono">{noteBase}♯</span></div>
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
+      </div>
+      
+      {/* Legend below the grid */}
+      <div className="flex items-center justify-center gap-6 mt-8 text-[12px] font-bold text-muted uppercase tracking-widest w-full">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-alice/30 border border-alice"></span>
+          Alice
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-bob/30 border border-bob"></span>
+          Bob
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-gradient-to-br from-alice via-surface to-bob border border-ink/20"></span>
+          Shared cell
         </div>
       </div>
     </div>
