@@ -6,8 +6,8 @@
 [![Frontend Build](https://img.shields.io/badge/Vite%20%2B%20React%2019-Passed-success)](https://vitejs.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Typecheck-blue)](https://www.typescriptlang.org/)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.5.1%20%2B%20Aer-purple)](https://qiskit.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-26%20Passed-green)](https://vitest.dev/)
-[![Pytest](https://img.shields.io/badge/Pytest-24%20Passed-green)](https://docs.pytest.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-31%20Passed-green)](https://vitest.dev/)
+[![Pytest](https://img.shields.io/badge/Pytest-28%20Passed%20(1%20skipped)-green)](https://docs.pytest.org/)
 [![Qollab Compliant](https://img.shields.io/badge/Qollab%20Platform-Zero%20Secrets%20%7C%20Static%20Only-teal)](#qollab-compliance--security-guarantee)
 
 ---
@@ -17,7 +17,7 @@
 **Isai** (*Isai*, meaning "music" or "melody" in Tamil, also known as *The 8/9 Duet*) sonifies quantum contextuality and pseudo-telepathy through an interactive, browser-native audiovisual experience structured into three progressive acts and challenge modes:
 1. **Act 1: Break It** — An unfilled 12-free-bit classical strategy puzzle where players discover the unavoidable 8/9 parity ceiling and hear the resulting clash.
 2. **Act 2: Entangle It** — A reproducible 4-qubit TypeScript statevector simulation with exact Qiskit probability parity (< $10^{-9}$), proving 9/9 unison without communication.
-3. **Act 3: Corrupt It** — Circuit-level stochastic Pauli depolarizing noise modeling gate decoherence with an interactive crossover curve and 95% Wilson confidence intervals.
+3. **Act 3: Corrupt It** — Circuit-level stochastic Pauli depolarizing noise modeling gate decoherence with an empirical crossover curve and 95% Wilson confidence intervals.
 4. **30-Round Survival Gauntlet** — Seeded uniform challenge testing whether classical (2.92% theoretical survival) or quantum (100% ideal) strategies survive 30 referee prompts.
 5. **Classical Communication Mode** — Compares 1-message classical signaling to quantum pseudo-telepathy, demonstrating why entanglement is fundamentally not signaling.
 
@@ -28,7 +28,7 @@
 | Criterion | Implementation in Isai |
 | :--- | :--- |
 | **Novelty & Creativity** | Transforms abstract operator contextuality into a musical duet. Left/Right stereo panning allows the ear to hear bipartite entanglement; matching crossing bits resonate in pure unison, while classical or noise-induced defects produce distinct semitone dissonance. |
-| **Technical Execution** | 50 automated tests passing across Python (`pytest`, 24 passed) and TypeScript (`vitest`, 26 passed), including golden statevector probability parity against Qiskit at $10^{-9}$ numerical tolerance, reproducible PRNG seeding (`mulberry32`), and exhaustive 4,096-strategy classical search with exact histogram verification. Pure Web Audio API synthesis (no external audio assets, no autoplay). Custom plain SVG charts with 95% Wilson confidence intervals. Strict TypeScript type-checking. |
+| **Technical Execution** | 59 automated tests passing across Python (`pytest`, 28 passed, 1 skipped) and TypeScript (`vitest`, 31 passed), including golden statevector probability parity against Qiskit at $10^{-9}$ numerical tolerance, reproducible PRNG seeding (`mulberry32`), and exhaustive 4,096-strategy classical search with exact histogram verification. Pure Web Audio API synthesis (no external audio assets, no autoplay). Custom plain SVG charts with 95% Wilson confidence intervals. Strict TypeScript type-checking. |
 | **Impact Potential** | An intuitive educational portal for university quantum information courses, hackathon judges, and researchers to understand non-locality, Mermin-Peres squares, and contextuality without opaque mathematics. |
 | **Documentation Quality** | Comprehensive documentation, formal mathematical proofs, documented JSON schema, step-by-step reproduction instructions, and clear scientific scope limitations. |
 
@@ -161,16 +161,35 @@ npm run build
 # Preview production build locally
 npm run preview
 ```
-Visit `http://localhost:4173` to explore the application!
+Visit `http://localhost:3000` to explore the application!
 
 ### 2. Python Circuit & Algebraic Tests
 ```bash
 # Run all Python unit tests
 pytest
 
-# Re-generate Aer simulator dataset
+# Re-generate Aer simulator dataset (from repository root)
 python -m scripts.generate_aer_results
+
+# Re-generate Aer noisy benchmark fixture (from repository root)
+python -m scripts.generate_aer_noise_fixture
+
+# Run standalone Qollab runner (using core Qiskit BasicSimulator fallback)
+python qollab/main.py
 ```
+
+---
+
+## 🎯 Qollab Submission Package (`qollab_submission.zip`)
+
+For judges evaluating through the Qollab platform:
+- **Location:** `qollab/` directory and bundled `qollab_submission.zip`
+- **Lean Constraints:** Contains exactly 4 files (`main.py`, `circuit.py`, `scoring.py`, `README.md`), total size < 10 KB (well within Qollab's 100-file and 2 MB limits). Excludes React app, `node_modules`, `.git`, and all extraneous files.
+- **Entry Point:** Top-level `main(shots: int)` function conforming to Qollab's Run dialog.
+- **Single Batch Job:** Submits all 9 circuits in exactly **one** `backend.run(circuits, shots=shots)` call.
+- **No Qiskit Aer Dependency in Runner:** Uses Qollab's provided runtime `backend` without importing `qiskit_aer`.
+- **Two Classical Registers Decoded:** Explicitly parses space-separated register keys (`'cb ca'`) and validates parity and crossing rules.
+- **Honest Labeling:** Clearly outputs terminal results as **Qollab Simulator Output** (ideal simulation), not physical hardware.
 
 ---
 
@@ -188,16 +207,8 @@ To evaluate physical hardware without exposing credentials or violating Qollab r
    # Linux / macOS Bash
    export QISKIT_IBM_TOKEN="your_token_here"
    ```
-3. Run the local batch capture tool:
-   ```bash
-   python scripts/capture_ibm_hardware.py --shots 1024
-   ```
-   The script:
-   - Queries an operational physical backend with $\ge 4$ qubits (e.g., `ibm_brisbane`, `ibm_sherbrooke`).
-   - Transpiles the circuits for the physical coupling map.
-   - Submits all 9 contexts in a unified Primitive Unified Bloc (PUB) batch via `SamplerV2`.
-   - Decodes responses, validates against `mermin_peres_results_schema.json`, and writes a sanitized JSON file.
-4. **Importing into the Web App:** Click **Import Run** in the web app header and select your generated JSON file. The badge will immediately switch to **RECORDED IBM HARDWARE**.
+3. Generate or validate your local hardware capture, formatted according to `mermin_peres_results_schema.json`.
+4. **Importing into the Web App:** Click **Import Run** in the web app header and select your generated JSON file. The badge will switch to **Recorded IBM run**.
 
 ---
 

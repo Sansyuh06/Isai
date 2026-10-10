@@ -12,6 +12,7 @@ interface Props {
   backendName: string;
   jobId?: string | null;
   onGoHome: () => void;
+  activeTab?: string;
 }
 
 export const Header: React.FC<Props> = ({
@@ -22,7 +23,8 @@ export const Header: React.FC<Props> = ({
   onOpenAbout,
   backendName,
   jobId,
-  onGoHome
+  onGoHome,
+  activeTab
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -47,6 +49,7 @@ export const Header: React.FC<Props> = ({
             backendName={backendName}
             jobId={jobId}
             className="hidden sm:inline-flex"
+            activeTab={activeTab}
           />
         </div>
 
@@ -63,7 +66,7 @@ export const Header: React.FC<Props> = ({
                   : 'text-muted hover:text-ink'
               }`}
             >
-              Aer run
+              Aer dataset
             </button>
             <button
               type="button"

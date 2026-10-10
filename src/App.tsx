@@ -127,6 +127,7 @@ export const App: React.FC = () => {
           setView('landing');
           setTargetAct(null);
         }}
+        activeTab={view === 'landing' ? 'landing' : activeTab}
       />
 
       {notification && (

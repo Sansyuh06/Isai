@@ -101,7 +101,7 @@ export const ClassicalCommunication: React.FC = () => {
       {/* Outcome Verdict */}
       <div className="p-4 rounded-xl bg-win/10 border border-win/30 flex items-center justify-between text-xs font-mono text-win">
         <div className="flex items-center gap-2 font-bold">
-          <CheckCircle2 className="w-4 h-4" /> Crossing agreement: Alice $a_{selectedCol}$ ({step.aliceBits[selectedCol]}) = Bob $b_{selectedRow}$ ({step.bobBits[selectedRow]})
+          <CheckCircle2 className="w-4 h-4" /> Crossing agreement: Alice bit at Col {selectedCol + 1} ({step.aliceBits[selectedCol]}) = Bob bit at Row {selectedRow + 1} ({step.bobBits[selectedRow]})
         </div>
         <span className="font-bold">Result: WIN (100% Guaranteed)</span>
       </div>

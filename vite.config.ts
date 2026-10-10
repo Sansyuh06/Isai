@@ -11,6 +11,11 @@ export default defineConfig({
   base: './',
   server: {
     port: 3000,
+    host: true,
     open: false
+  },
+  preview: {
+    port: 3000,
+    host: true
   }
 });
