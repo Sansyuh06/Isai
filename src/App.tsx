@@ -12,8 +12,6 @@ import { ActiveCircuit } from './components/ActiveCircuit';
 import { ClassicalPuzzle } from './components/ClassicalPuzzle';
 import { Act2Entangle } from './components/Act2Entangle';
 import { Act3Corrupt } from './components/Act3Corrupt';
-import { SurvivalChallenge } from './components/SurvivalChallenge';
-import { NullableBitGrid } from './utils/classicalStrategy';
 import { WinRateChart } from './components/WinRateChart';
 import { HistoryTable } from './components/HistoryTable';
 import { EmptyHardwareState } from './components/EmptyHardwareState';
@@ -27,18 +25,6 @@ export const App: React.FC = () => {
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
   const [activeTab, setActiveTab] = useState<string>('act1');
   const [view, setView] = useState<'landing' | 'app'>('landing');
-
-  // Player strategy grids initialized as empty (null)
-  const [playerAliceGrid, setPlayerAliceGrid] = useState<NullableBitGrid>([
-    [null, null, null],
-    [null, null, null],
-    [null, null, null]
-  ]);
-  const [playerBobGrid, setPlayerBobGrid] = useState<NullableBitGrid>([
-    [null, null, null],
-    [null, null, null],
-    [null, null, null]
-  ]);
 
   const [selectedRow, setSelectedRow] = useState<number>(0);
   const [selectedCol, setSelectedCol] = useState<number>(0);
@@ -188,18 +174,12 @@ export const App: React.FC = () => {
             <TabsTrigger value="act1">Act 1: Break it</TabsTrigger>
             <TabsTrigger value="act2">Act 2: Entangle it</TabsTrigger>
             <TabsTrigger value="act3">Act 3: Corrupt it</TabsTrigger>
-            <TabsTrigger value="survival">30-Round Survival</TabsTrigger>
             <TabsTrigger value="tutorial">Why does this happen?</TabsTrigger>
             <TabsTrigger value="results">Data & Provenance</TabsTrigger>
           </TabsList>
 
           <TabsContent value="act1">
-            <ClassicalPuzzle 
-              onStrategyUpdated={(alice, bob) => {
-                setPlayerAliceGrid(alice);
-                setPlayerBobGrid(bob);
-              }}
-            />
+            <ClassicalPuzzle />
           </TabsContent>
 
           <TabsContent value="act2">
@@ -208,14 +188,6 @@ export const App: React.FC = () => {
 
           <TabsContent value="act3">
             <Act3Corrupt ibmDataset={ibmData} />
-          </TabsContent>
-
-          <TabsContent value="survival">
-            <SurvivalChallenge
-              playerAliceGrid={playerAliceGrid}
-              playerBobGrid={playerBobGrid}
-              onGoToAct1={() => setActiveTab('act1')}
-            />
           </TabsContent>
 
           <TabsContent value="tutorial" className="space-y-6">
