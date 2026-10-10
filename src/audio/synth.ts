@@ -276,6 +276,51 @@ class QuantumDuetAudioEngine {
     }
     return true;
   }
+
+  /**
+   * Fast 9-beat crossing-cell chord loop (one punchy beat per context)
+   * Plays matching bits in pure unison and differing bits in adjacent semitone clash.
+   */
+  async playNineBeatFastLoop(
+    contexts: Array<{
+      row: number;
+      col: number;
+      aliceSharedBit: number;
+      bobSharedBit: number;
+    }>,
+    onBeat?: (ctxIndex: number, isMatch: boolean) => void
+  ): Promise<boolean> {
+    this.stopAll();
+    await this.ensureContext();
+    const playId = ++this.currentPlayId;
+
+    const beatDuration = 0.35;
+    const beatInterval = 0.45;
+
+    for (let i = 0; i < contexts.length; i++) {
+      if (this.currentPlayId !== playId) return false;
+
+      const { row, col, aliceSharedBit, bobSharedBit } = contexts[i];
+      const aPitch = getCellPitch(row, col, aliceSharedBit);
+      const bPitch = getCellPitch(row, col, bobSharedBit);
+      const isMatch = aliceSharedBit === bobSharedBit;
+
+      if (onBeat) {
+        onBeat(i, isMatch);
+      }
+
+      // Alice panned left (-0.7), Bob panned right (+0.7)
+      this.playTone(aPitch.freq, -0.7, beatDuration);
+      this.playTone(bPitch.freq, 0.7, beatDuration);
+
+      await new Promise((r) => setTimeout(r, beatInterval * 1000));
+    }
+
+    if (this.currentPlayId === playId && onBeat) {
+      onBeat(-1, true);
+    }
+    return true;
+  }
 }
 
 export const audioEngine = new QuantumDuetAudioEngine();

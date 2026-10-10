@@ -1,34 +1,35 @@
 import React, { useState } from 'react';
-import { PlayCircle, ShieldAlert } from 'lucide-react';
+import { PlayCircle, StopCircle, AlertTriangle } from 'lucide-react';
 import { MagicGrid } from './MagicGrid';
 import { runMagicSquareSimulation } from '../utils/simulator';
-import { audioEngine, VisualStepEvent } from '../audio/synth';
+import { audioEngine } from '../audio/synth';
 import { MerminPeresDataset } from '../types/data';
+import { calculateWilsonCI } from '../utils/scoring';
 
 interface Props {
   ibmDataset?: MerminPeresDataset | null;
 }
 
 export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
-  const [noiseLevel, setNoiseLevel] = useState<number>(0.05); // 5% default
+  const [noiseLevel, setNoiseLevel] = useState<number>(0.03); // 3% default
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const [activeStepEvent, setActiveStepEvent] = useState<VisualStepEvent | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [lastResult, setLastResult] = useState<{ aliceBits: number[], bobBits: number[], win: boolean } | null>(null);
   const [useHardware, setUseHardware] = useState(false);
 
-  const runSingle = async (r: number, c: number) => {
-    setSelectedRow(r);
-    setSelectedCol(c);
-    
-    let aBits, bBits, win;
+  // Cumulative results across all 9 contexts
+  const [contextResults, setContextResults] = useState<Record<string, {
+    wins: number;
+    total: number;
+    sampleAliceBits: [number, number, number];
+    sampleBobBits: [number, number, number];
+    lastWin: boolean;
+  }>>({});
 
+  const sampleSingleContext = (r: number, c: number, p: number) => {
     if (useHardware && ibmDataset) {
-      // Pick a random shot from the dataset's recorded context distribution
       const ctx = ibmDataset.contexts.find(x => x.row === r && x.column === c);
-      if (ctx) {
-        // Weighted random choice
+      if (ctx && ctx.counts.length > 0) {
         const total = ctx.shots;
         let rand = Math.random() * total;
         let selected = ctx.counts[0];
@@ -39,139 +40,275 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
             break;
           }
         }
-        aBits = selected.alice_bits;
-        bBits = selected.bob_bits;
-        win = aBits[c] === bBits[r];
-      } else {
-        aBits = [0,0,0]; bBits = [0,0,0]; win = false;
+        const aBits = selected.alice_bits as [number, number, number];
+        const bBits = selected.bob_bits as [number, number, number];
+        return {
+          aliceBits: aBits,
+          bobBits: bBits,
+          win: aBits[c] === bBits[r]
+        };
       }
-    } else {
-      // Simulate with noise
-      const result = runMagicSquareSimulation(r, c, noiseLevel);
-      aBits = result.aliceBits;
-      bBits = result.bobBits;
-      win = result.win;
+    }
+    return runMagicSquareSimulation(r, c, p);
+  };
+
+  const runSingle = async (r: number, c: number) => {
+    if (isPlaying) return;
+    setSelectedRow(r);
+    setSelectedCol(c);
+
+    // Run batch of shots (e.g. 50 shots per single click)
+    const shotsToRun = 50;
+    let winsInBatch = 0;
+    let lastOutcome = sampleSingleContext(r, c, noiseLevel);
+
+    for (let i = 0; i < shotsToRun; i++) {
+      const outcome = sampleSingleContext(r, c, noiseLevel);
+      if (outcome.win) winsInBatch++;
+      lastOutcome = outcome;
     }
 
-    setLastResult({ aliceBits: aBits, bobBits: bBits, win });
-    
-    // Play audio
-    await audioEngine.playContextRound(
-      r, c, 
-      aBits as [number, number, number], 
-      bBits as [number, number, number],
-      (e) => setActiveStepEvent(e)
-    );
-    setActiveStepEvent(null);
+    setContextResults(prev => {
+      const existing = prev[`${r}_${c}`] || { wins: 0, total: 0, sampleAliceBits: lastOutcome.aliceBits, sampleBobBits: lastOutcome.bobBits, lastWin: lastOutcome.win };
+      return {
+        ...prev,
+        [`${r}_${c}`]: {
+          wins: existing.wins + winsInBatch,
+          total: existing.total + shotsToRun,
+          sampleAliceBits: lastOutcome.aliceBits,
+          sampleBobBits: lastOutcome.bobBits,
+          lastWin: lastOutcome.win
+        }
+      };
+    });
+
+    // Play representative audio chord
+    await audioEngine.playNineBeatFastLoop([{
+      row: r,
+      col: c,
+      aliceSharedBit: lastOutcome.aliceBits[c],
+      bobSharedBit: lastOutcome.bobBits[r]
+    }]);
+  };
+
+  const handleStop = () => {
+    audioEngine.stopAll();
+    setIsPlaying(false);
   };
 
   const playNineBeatLoop = async () => {
-    if (isPlaying) return;
-    setIsPlaying(true);
-    try {
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-          await runSingle(r, c);
-          await new Promise(res => setTimeout(res, 200));
-        }
-      }
-    } finally {
-      setIsPlaying(false);
-      setActiveStepEvent(null);
+    if (isPlaying) {
+      handleStop();
+      return;
     }
+
+    setIsPlaying(true);
+    const shotsPerCtx = 20;
+    const newResults: Record<string, {
+      wins: number;
+      total: number;
+      sampleAliceBits: [number, number, number];
+      sampleBobBits: [number, number, number];
+      lastWin: boolean;
+    }> = {};
+
+    const audioPayload: Array<{
+      row: number;
+      col: number;
+      aliceSharedBit: number;
+      bobSharedBit: number;
+    }> = [];
+
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        let winsInBatch = 0;
+        let lastOutcome = sampleSingleContext(r, c, noiseLevel);
+        for (let s = 0; s < shotsPerCtx; s++) {
+          const outcome = sampleSingleContext(r, c, noiseLevel);
+          if (outcome.win) winsInBatch++;
+          lastOutcome = outcome;
+        }
+
+        newResults[`${r}_${c}`] = {
+          wins: winsInBatch,
+          total: shotsPerCtx,
+          sampleAliceBits: lastOutcome.aliceBits,
+          sampleBobBits: lastOutcome.bobBits,
+          lastWin: lastOutcome.win
+        };
+
+        audioPayload.push({
+          row: r,
+          col: c,
+          aliceSharedBit: lastOutcome.aliceBits[c],
+          bobSharedBit: lastOutcome.bobBits[r]
+        });
+      }
+    }
+
+    setContextResults(newResults);
+
+    await audioEngine.playNineBeatFastLoop(audioPayload, (idx) => {
+      if (idx >= 0 && idx < audioPayload.length) {
+        setSelectedRow(audioPayload[idx].row);
+        setSelectedCol(audioPayload[idx].col);
+      }
+    });
+
+    setIsPlaying(false);
   };
 
+  // Aggregated metrics
+  let totalWins = 0;
+  let totalShots = 0;
+  Object.values(contextResults).forEach(res => {
+    totalWins += res.wins;
+    totalShots += res.total;
+  });
+
+  const aggregateWinRate = totalShots > 0 ? (totalWins / totalShots) : null;
+  const wilsonInterval = totalShots > 0 ? calculateWilsonCI(totalWins, totalShots) : [0, 0];
+  const activeCtxResult = contextResults[`${selectedRow}_${selectedCol}`];
+
   return (
-    <div className="flex flex-col items-center max-w-[1000px] mx-auto space-y-12 animate-fade-in-up">
-      <div className="text-center space-y-4 max-w-3xl">
-        <h2 className="text-[32px] font-display font-bold">Act 3: Corrupt It</h2>
-        <p className="text-muted text-[16px]">
-          Quantum entanglement is fragile. We inject stochastic Pauli depolarizing noise into the statevector after every gate to simulate a real noisy quantum processing unit (QPU). 
-          Notice how errors cause the perfect 9/9 unison to randomly clash.
+    <div className="flex flex-col items-center max-w-[1100px] mx-auto space-y-10 animate-fade-in-up">
+      <div className="text-center space-y-3 max-w-3xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-loss/10 text-loss border border-loss/20">
+          Act 3: Noise & Realistic Verification
+        </div>
+        <h2 className="text-[36px] font-display font-extrabold text-ink leading-tight">
+          Corrupt It: The Fragility of Entanglement
+        </h2>
+        <p className="text-muted text-[16px] leading-relaxed">
+          Stochastic Pauli depolarizing noise (with Pauli $X, Y, Z$ inserted with probability $p/3$ after each gate) models state decoherence. 
+          Notice how fidelity degrades and acoustic unisons fracture into random dissonant semitone clashes.
         </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 w-full items-start">
+        {/* Left: MagicGrid and Loop Button */}
         <div className="flex-1 w-full flex flex-col items-center space-y-6">
           <MagicGrid
             selectedRow={selectedRow}
             selectedCol={selectedCol}
             onSelectContext={(r, c) => runSingle(r, c)}
-            activeStepEvent={activeStepEvent}
-            aliceBits={lastResult?.aliceBits}
-            bobBits={lastResult?.bobBits}
+            activeStepEvent={null}
+            aliceBits={activeCtxResult?.sampleAliceBits}
+            bobBits={activeCtxResult?.sampleBobBits}
           />
           
-          <button 
-            onClick={playNineBeatLoop}
-            disabled={isPlaying}
-            className="flex items-center gap-2 px-8 py-4 bg-ink text-paper rounded-full font-bold hover:scale-105 transition-transform disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-          >
-            <PlayCircle className="w-5 h-5"/>
-            {isPlaying ? 'Running...' : 'Hear the Noisy Strategy'}
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              type="button"
+              onClick={playNineBeatLoop}
+              className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold text-[15px] transition-all shadow-lg
+                ${isPlaying 
+                  ? 'bg-loss text-white hover:bg-loss/90 animate-pulse' 
+                  : 'bg-ink text-paper hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.1)]'
+                }
+              `}
+            >
+              {isPlaying ? (
+                <>
+                  <StopCircle className="w-5 h-5"/> Stop Playback
+                </>
+              ) : (
+                <>
+                  <PlayCircle className="w-5 h-5"/> Play Noisy 9-Beat Loop
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="w-full lg:w-[400px] space-y-6">
-          <div className="glass-card p-6 space-y-6">
-            <h3 className="text-[14px] font-bold tracking-wider text-muted uppercase">Noise Model Configuration</h3>
-            
-            <div className="space-y-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-[12px] font-bold flex justify-between">
-                  <span>Depolarizing Error Probability (p)</span>
-                  <span className="font-mono text-bob">{noiseLevel.toFixed(3)}</span>
-                </label>
-                <input 
-                  type="range" 
-                  min="0" max="0.2" step="0.005" 
-                  value={noiseLevel} 
-                  onChange={(e) => {
-                    setNoiseLevel(parseFloat(e.target.value));
-                    setUseHardware(false);
-                  }}
-                  className="w-full accent-bob"
-                  disabled={useHardware}
-                />
-                <p className="text-[11px] text-muted leading-relaxed mt-1">
-                  Applies X, Y, or Z errors (each with probability p/3) after every single- and two-qubit gate in the Mermin-Peres preparation and basis rotations.
-                </p>
-              </div>
-
-              {ibmDataset && (
-                <div className="pt-4 border-t border-hairline mt-4">
-                   <label className="flex items-center gap-3 cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={useHardware} 
-                      onChange={(e) => setUseHardware(e.target.checked)}
-                      className="w-4 h-4 accent-win"
-                    />
-                    <span className="text-[14px] font-bold">Use recorded IBM Hardware run</span>
-                  </label>
-                  {useHardware && (
-                    <p className="text-[11px] text-muted mt-2">
-                      Currently replaying Job <code>{ibmDataset.ibm_job_id?.slice(0,8)}</code> from <strong>{ibmDataset.backend_name}</strong>.
-                    </p>
-                  )}
-                </div>
-              )}
+        {/* Right: Noise Configuration & Statistical Scope */}
+        <div className="w-full lg:w-[420px] space-y-6">
+          <div className="glass-card p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-hairline pb-3">
+              <h3 className="text-xs font-mono font-bold tracking-wider text-muted uppercase">
+                Noise Model Parameters
+              </h3>
+              <span className="text-xs font-mono font-bold text-bob bg-bob/10 px-2 py-0.5 rounded border border-bob/20">
+                {useHardware ? 'Recorded IBM QPU' : 'Stochastic Depolarizing'}
+              </span>
             </div>
 
-            {lastResult && (
-              <div className={`p-4 rounded-[8px] border mt-4 ${lastResult.win ? 'bg-win/10 border-win/30 text-win' : 'bg-loss/10 border-loss/30 text-loss'}`}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[12px] font-bold uppercase tracking-widest">Shared Cell Result</span>
-                  <span className="font-bold flex items-center gap-1">
-                    {lastResult.win ? 'MATCH' : <><ShieldAlert className="w-4 h-4"/> CLASH</>}
-                  </span>
-                </div>
-                <div className="flex justify-between text-[14px] font-mono">
-                  <span>Alice: {lastResult.aliceBits[selectedCol]}</span>
-                  <span>Bob: {lastResult.bobBits[selectedRow]}</span>
-                </div>
+            {/* Slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono font-bold">
+                <span>Gate Error Probability (p)</span>
+                <span className="text-bob font-bold text-sm">{noiseLevel.toFixed(3)}</span>
+              </div>
+              <input 
+                type="range" 
+                min="0" max="0.15" step="0.005" 
+                value={noiseLevel} 
+                disabled={isPlaying || useHardware}
+                onChange={(e) => {
+                  setNoiseLevel(parseFloat(e.target.value));
+                  setUseHardware(false);
+                }}
+                className="w-full accent-bob"
+              />
+              <div className="flex justify-between text-[10px] font-mono text-muted">
+                <span>0.000 (Ideal 100%)</span>
+                <span>~0.02 (Model Crossover)</span>
+                <span>0.150 (Heavy Noise)</span>
+              </div>
+            </div>
+
+            {/* Note on crossover */}
+            <div className="p-3 bg-surface rounded-[8px] border border-hairline text-[11px] leading-relaxed text-muted">
+              <strong>Noise Model Specifics:</strong> Error $p$ represents the per-gate depolarizing channel probability for this circuit topology. 
+              The threshold where win rate drops below 8/9 is model-specific ($\approx 0.02$ for this 4-qubit circuit) and not a universal physical constant.
+            </div>
+
+            {/* Optional Hardware Toggle */}
+            {ibmDataset ? (
+              <div className="pt-2 border-t border-hairline">
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={useHardware} 
+                    disabled={isPlaying}
+                    onChange={(e) => setUseHardware(e.target.checked)}
+                    className="w-4 h-4 accent-win"
+                  />
+                  <span className="text-xs font-bold text-ink">Replay Recorded IBM Run ({ibmDataset.backend_name})</span>
+                </label>
+              </div>
+            ) : (
+              <div className="pt-2 border-t border-hairline text-[11px] text-muted flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-bob" />
+                <span>No recorded IBM QPU dataset loaded. Replaying pure simulation.</span>
               </div>
             )}
+
+            {/* Cumulative Statistics Scoreboard */}
+            <div className="space-y-3 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-between text-xs font-mono text-muted uppercase">
+                <span>Aggregated Win Rate</span>
+                <span>{totalShots} Total Shots</span>
+              </div>
+
+              <div className="p-4 bg-surface rounded-[10px] border border-hairline flex items-center justify-between">
+                <div>
+                  <span className="font-mono text-[32px] font-bold leading-none text-ink">
+                    {aggregateWinRate !== null ? `${(aggregateWinRate * 100).toFixed(1)}%` : '—'}
+                  </span>
+                  <div className="text-[11px] font-mono text-muted mt-1">
+                    {totalWins} / {totalShots} matches
+                  </div>
+                </div>
+
+                {totalShots > 0 && (
+                  <div className="text-right font-mono text-xs text-muted">
+                    <span className="block font-bold text-ink">95% Wilson CI</span>
+                    <span>[{(wilsonInterval[0] * 100).toFixed(1)}%, {(wilsonInterval[1] * 100).toFixed(1)}%]</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

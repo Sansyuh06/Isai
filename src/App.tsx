@@ -158,7 +158,10 @@ export const App: React.FC = () => {
             setView('app');
             setActiveTab('act2');
           }}
-          onTour={() => alert('Tour feature coming soon!')}
+          onTour={() => {
+            setView('app');
+            setActiveTab('tutorial');
+          }}
           onBeatClassical={() => {
             setView('app');
             setActiveTab('act1');

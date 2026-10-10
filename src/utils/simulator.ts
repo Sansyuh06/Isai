@@ -16,13 +16,13 @@ export class Statevector {
   public amplitudes: Complex[];
 
   constructor() {
-    this.amplitudes = new Array(16).fill([0, 0]);
+    this.amplitudes = new Array(16).fill(null).map(() => [0, 0] as Complex);
     this.amplitudes[0] = [1, 0]; // |0000>
   }
 
   // Apply a 1-qubit gate (2x2 matrix) to target qubit (0 to 3)
   apply1Q(matrix: [Complex, Complex, Complex, Complex], target: number) {
-    const newAmps: Complex[] = new Array(16).fill([0, 0]);
+    const newAmps: Complex[] = new Array(16).fill(null).map(() => [0, 0] as Complex);
     for (let i = 0; i < 16; i++) {
       const bit = (i >> target) & 1;
       const flipped = i ^ (1 << target);
@@ -54,9 +54,14 @@ export class Statevector {
     this.amplitudes = newAmps;
   }
 
-  // Measurement (destructive) - returns measured integer 0-15
+  // Probabilities of all 16 computational basis states
+  getProbabilities(): number[] {
+    return this.amplitudes.map(a => a[0] * a[0] + a[1] * a[1]);
+  }
+
+  // Measurement (destructive / sampled) - returns measured integer 0-15
   measure(): number {
-    const probs = this.amplitudes.map(a => a[0] * a[0] + a[1] * a[1]);
+    const probs = this.getProbabilities();
     const r = Math.random();
     let sum = 0;
     for (let i = 0; i < 16; i++) {
@@ -66,15 +71,16 @@ export class Statevector {
     return 15;
   }
 
-  // Normalization just in case
   normalize() {
     let norm = 0;
     for (let i = 0; i < 16; i++) {
       norm += this.amplitudes[i][0] * this.amplitudes[i][0] + this.amplitudes[i][1] * this.amplitudes[i][1];
     }
-    const scale = 1 / Math.sqrt(norm);
-    for (let i = 0; i < 16; i++) {
-      this.amplitudes[i] = [this.amplitudes[i][0] * scale, this.amplitudes[i][1] * scale];
+    if (norm > 0) {
+      const scale = 1 / Math.sqrt(norm);
+      for (let i = 0; i < 16; i++) {
+        this.amplitudes[i] = [this.amplitudes[i][0] * scale, this.amplitudes[i][1] * scale];
+      }
     }
   }
 }
@@ -110,6 +116,7 @@ export const GATES = {
 
 // Depolarizing noise
 function applyNoise(sv: Statevector, qubit: number, p: number) {
+  if (p <= 0) return;
   if (Math.random() < p) {
     const errorType = Math.random();
     if (errorType < 1/3) sv.apply1Q(GATES.X, qubit);
@@ -118,11 +125,43 @@ function applyNoise(sv: Statevector, qubit: number, p: number) {
   }
 }
 
-export function runMagicSquareSimulation(row: number, col: number, noiseP: number = 0) {
+export function decodeAliceBits(row: number, a0: number, a1: number): [number, number, number] {
+  if (row === 0) {
+    const b0 = a0 ^ 1;
+    const b1 = a1 ^ 1;
+    return [b0, b1, b0 ^ b1];
+  } else if (row === 1) {
+    const b0 = a1;
+    const b1 = a0;
+    return [b0, b1, b0 ^ b1];
+  } else {
+    const b2 = a1;
+    const b1 = a0 ^ 1;
+    return [b1 ^ b2, b1, b2];
+  }
+}
+
+export function decodeBobBits(col: number, b0: number, b1: number): [number, number, number] {
+  if (col === 0) {
+    const c0 = b0 ^ 1;
+    const c1 = b1;
+    return [c0, c1, c0 ^ c1 ^ 1];
+  } else if (col === 1) {
+    const c0 = b1 ^ 1;
+    const c1 = b0;
+    return [c0, c1, c0 ^ c1 ^ 1];
+  } else {
+    const c0 = b0;
+    const c2 = b1;
+    return [c0, c0 ^ c2 ^ 1, c2];
+  }
+}
+
+export function buildStatevectorCircuit(row: number, col: number, noiseP: number = 0): Statevector {
   const sv = new Statevector();
-  // Qubits: A1=0, A2=1, B1=2, B2=3
+  // Qubits: A0=0, A1=1, B0=2, B1=3
   
-  // Entanglement Prep
+  // Entanglement Prep: Bell pairs on (A0, B0) and (A1, B1)
   sv.apply1Q(GATES.H, 0);
   applyNoise(sv, 0, noiseP);
   sv.applyCX(0, 2);
@@ -162,49 +201,47 @@ export function runMagicSquareSimulation(row: number, col: number, noiseP: numbe
     sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP);
   }
 
-  // Measure
   sv.normalize();
+  return sv;
+}
+
+export function getExactContextOutcomeProbabilities(row: number, col: number): Record<string, number> {
+  const sv = buildStatevectorCircuit(row, col, 0);
+  const probs = sv.getProbabilities();
+  const outcomeMap: Record<string, number> = {};
+
+  for (let idx = 0; idx < 16; idx++) {
+    const p = probs[idx];
+    if (p > 1e-9) {
+      const a0 = (idx >> 0) & 1;
+      const a1 = (idx >> 1) & 1;
+      const b0 = (idx >> 2) & 1;
+      const b1 = (idx >> 3) & 1;
+
+      const aBits = decodeAliceBits(row, a0, a1);
+      const bBits = decodeBobBits(col, b0, b1);
+      const key = `[${aBits.join(', ')}]|[${bBits.join(', ')}]`;
+      outcomeMap[key] = (outcomeMap[key] || 0) + p;
+    }
+  }
+
+  return outcomeMap;
+}
+
+export function runMagicSquareSimulation(row: number, col: number, noiseP: number = 0) {
+  const sv = buildStatevectorCircuit(row, col, noiseP);
   const res = sv.measure();
-  const a0 = (res >> 0) & 1; // A1
-  const a1 = (res >> 1) & 1; // A2
-  const b0 = (res >> 2) & 1; // B1
-  const b1 = (res >> 3) & 1; // B2
+  const a0 = (res >> 0) & 1;
+  const a1 = (res >> 1) & 1;
+  const b0 = (res >> 2) & 1;
+  const b1 = (res >> 3) & 1;
 
-  // Decode Alice
-  let a_bits = [0, 0, 0];
-  if (row === 0) {
-    a_bits[0] = a0 ^ 1;
-    a_bits[1] = a1 ^ 1;
-    a_bits[2] = a_bits[0] ^ a_bits[1];
-  } else if (row === 1) {
-    a_bits[0] = a1;
-    a_bits[1] = a0;
-    a_bits[2] = a_bits[0] ^ a_bits[1];
-  } else {
-    a_bits[2] = a1;
-    a_bits[1] = a0 ^ 1;
-    a_bits[0] = a_bits[1] ^ a_bits[2];
-  }
-
-  // Decode Bob
-  let b_bits = [0, 0, 0];
-  if (col === 0) {
-    b_bits[0] = b0 ^ 1;
-    b_bits[1] = b1;
-    b_bits[2] = b_bits[0] ^ b_bits[1] ^ 1;
-  } else if (col === 1) {
-    b_bits[0] = b1 ^ 1;
-    b_bits[1] = b0;
-    b_bits[2] = b_bits[0] ^ b_bits[1] ^ 1;
-  } else {
-    b_bits[0] = b0;
-    b_bits[2] = b1;
-    b_bits[1] = b_bits[0] ^ b_bits[2] ^ 1;
-  }
+  const aBits = decodeAliceBits(row, a0, a1);
+  const bBits = decodeBobBits(col, b0, b1);
 
   return { 
-    aliceBits: a_bits as [number, number, number], 
-    bobBits: b_bits as [number, number, number],
-    win: a_bits[col] === b_bits[row]
+    aliceBits: aBits, 
+    bobBits: bBits,
+    win: aBits[col] === bBits[row]
   };
 }

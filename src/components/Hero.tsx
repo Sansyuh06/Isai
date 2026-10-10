@@ -47,14 +47,14 @@ export const Hero: React.FC<Props> = ({ dataset, onHearDuet, onTour, onBeatClass
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <button onClick={onHearDuet} className="flex items-center gap-2 px-8 py-4 bg-ink text-paper rounded-full font-bold text-[16px] hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            <PlayCircle className="w-5 h-5" /> Hear the duet
+          <button onClick={onBeatClassical} className="flex items-center gap-2 px-8 py-4 bg-ink text-paper rounded-full font-bold text-[16px] hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+            Act 1: Try to beat 8/9
+          </button>
+          <button onClick={onHearDuet} className="flex items-center gap-2 px-6 py-4 bg-win/10 border border-win/30 text-win rounded-full font-bold text-[16px] hover:bg-win/20 transition-colors">
+            <PlayCircle className="w-5 h-5" /> Act 2: Hear 9/9 Quantum Duet
           </button>
           <button onClick={onTour} className="px-6 py-4 bg-surface border border-hairline text-ink rounded-full font-bold text-[16px] hover:bg-hairline/50 transition-colors">
-            60-second judge tour
-          </button>
-          <button onClick={onBeatClassical} className="flex items-center gap-2 px-6 py-4 bg-bob/10 border border-bob/30 text-bob-text rounded-full font-bold text-[16px] hover:bg-bob/20 transition-colors">
-            Act 1: Try to beat 8/9
+            Step-by-Step Explainer
           </button>
         </div>
       </div>
