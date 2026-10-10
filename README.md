@@ -196,7 +196,3 @@ qollab/         Qollab platform runner
 ## Credits
 
 Built with React, TypeScript, Vite, Tailwind CSS, Radix UI, Lucide icons and IBM Plex / Fraunces fonts via Fontsource, plus Qiskit and Qiskit Aer for the reference circuits and data. Thanks to Qollab and IonQ for the hackathon.
-
-## License
-
-MIT
