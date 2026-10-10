@@ -121,21 +121,19 @@ def print_results_table(results: dict) -> None:
     print()
 
 
-def main(shots: int = 1000, backend: Optional[Any] = None) -> None:
-    """Top-level entry point required by Qollab runtime.
+def main(shots: int = 1000):
+    """Top-level entry point called by Qollab runtime.
     
-    Qollab injects `backend` in the global namespace and calls `main(shots=...)`.
+    Qollab injects `backend` in the global scope and calls `main(shots=...)`.
     """
-    # 1. Resolve backend
-    active_backend = backend
-    if active_backend is None:
-        # Check global environment injected by Qollab runtime
-        if "backend" in globals():
-            active_backend = globals()["backend"]
-        elif "backend" in sys.modules["__main__"].__dict__:
+    global backend
+    try:
+        active_backend = backend
+    except NameError:
+        # Check __main__ namespace or fall back to local basic_simulator for standalone runs
+        if "backend" in sys.modules.get("__main__", {}).__dict__:
             active_backend = sys.modules["__main__"].__dict__["backend"]
         else:
-            # Fallback for standalone local test execution using core Qiskit basic_provider
             try:
                 from qiskit.providers.basic_provider import BasicProvider
                 active_backend = BasicProvider().get_backend("basic_simulator")
@@ -145,10 +143,15 @@ def main(shots: int = 1000, backend: Optional[Any] = None) -> None:
                     "Qollab runtime 'backend' was not provided and local fallback failed: " + str(e)
                 )
 
-    # 2. Run experiment and display results
+    # Run experiment and display results
     results = run_experiment(backend=active_backend, shots=shots)
     print_results_table(results)
+    return results
 
 
-if __name__ == "__main__":
+# When running outside Qollab in a standalone terminal, execute main(1000).
+# When running inside Qollab, `backend` is present in globals, so the runtime
+# will invoke main(shots=...) after script loading; do not call it here to avoid running twice.
+if __name__ == "__main__" and "backend" not in globals():
     main(shots=1000)
+

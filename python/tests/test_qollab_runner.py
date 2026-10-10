@@ -76,14 +76,20 @@ def test_qollab_two_register_decoding():
 
 def test_qollab_runner_with_core_qiskit_simulator(capsys):
     """Run full Qollab main() using BasicSimulator and verify 100% win rate."""
-    backend = BasicProvider().get_backend("basic_simulator")
-    main(shots=50, backend=backend)
-    captured = capsys.readouterr().out
+    import main as qollab_main
+    # Simulate Qollab injecting backend in global scope
+    qollab_main.backend = BasicProvider().get_backend("basic_simulator")
+    try:
+        qollab_main.main(shots=50)
+        captured = capsys.readouterr().out
 
-    assert "ISAI: THE 8/9 DUET" in captured
-    assert "QOLLAB SIMULATOR OUTPUT" in captured
-    assert "100.00%" in captured
-    assert "9/9" in captured
+        assert "ISAI: THE 8/9 DUET" in captured
+        assert "QOLLAB SIMULATOR OUTPUT" in captured
+        assert "100.00%" in captured
+        assert "9/9" in captured
+    finally:
+        if hasattr(qollab_main, "backend"):
+            delattr(qollab_main, "backend")
 
 
 def test_qollab_zip_file_constraints():
@@ -99,6 +105,9 @@ def test_qollab_zip_file_constraints():
         assert "main.py" in filenames
         assert "circuit.py" in filenames
         assert "scoring.py" in filenames
+        assert "README.md" in filenames
+        assert "requirements.txt" in filenames
         for info in infolist:
             assert info.file_size <= 2 * 1024 * 1024, f"{info.filename} exceeds 2MB limit"
+
 

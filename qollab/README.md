@@ -4,7 +4,7 @@
 This project demonstrates the **Mermin–Peres Magic Square game** (pseudo-telepathy) using Qiskit.
 In this game:
 - Two non-communicating players (Alice and Bob) are queried on a 3×3 grid.
-- Classically, no deterministic or shared-randomness strategy can exceed **8/9 (88.89%)** agreement due to parity contradiction ($0 \equiv 1 \pmod 2$).
+- Classically, no deterministic or shared-randomness strategy can exceed **8/9 (88.89%)** agreement due to parity contradiction (0 = 1 mod 2).
 - Using two entangled Bell pairs, Alice and Bob perform local Clifford basis rotations and achieve **9/9 (100%)** agreement without signaling.
 
 ---
