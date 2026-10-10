@@ -4,11 +4,7 @@
 
 Isai (இசை, Tamil for "music") is a browser game that lets you *fail* at a famous quantum puzzle and then *hear* why entangled qubits succeed where classical strategies cannot. A static website, no backend and no accounts. Built for the Qollab Quantum Hackathon.
 
-**Live demo:** _add your deployed URL here_
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue)
-![Static site](https://img.shields.io/badge/hosting-static%20only-teal)
-![Qiskit 2.5](https://img.shields.io/badge/Qiskit-2.5.1-purple)
 
 ---
 
