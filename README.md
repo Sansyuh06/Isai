@@ -1,6 +1,6 @@
-# The 8/9 Duet 🎵⚛️
+# Isai 🎵⚛️
 
-> **An Audio-First Quantum Nonlocality Explorer for the Mermin–Peres Magic Square Game**  
+> **An Audio-First Quantum Nonlocality Explorer for the Mermin–Peres Magic Square Game (The 8/9 Duet)**  
 > *Qollab Hackathon Submission · Repository: `Isai-qollab_hackathon`*
 
 [![Frontend Build](https://img.shields.io/badge/Vite%20%2B%20React%2019-Passed-success)](https://vitejs.dev/)
@@ -14,7 +14,7 @@
 
 ## 🌟 Executive Summary
 
-**The 8/9 Duet** (*Isai*, meaning "music" in Tamil) sonifies quantum contextuality and pseudo-telepathy through an interactive, browser-native audiovisual experience. 
+**Isai** (*Isai*, meaning "music" or "melody" in Tamil, also known as *The 8/9 Duet*) sonifies quantum contextuality and pseudo-telepathy through an interactive, browser-native audiovisual experience. 
 
 In classical game theory, two players (Alice and Bob) playing the Mermin–Peres Magic Square game without communication are mathematically bounded by a maximum win probability of **8/9 (≈ 88.89%)**. However, by sharing two entangled Bell pairs $|\Phi^+\rangle$ and performing compatible local Pauli measurements, Alice and Bob can achieve a theoretical win rate of **9/9 (100%)** without communicating during the round.
 
@@ -29,7 +29,7 @@ This project delivers:
 
 ## 🏆 Alignment with Hackathon Judging Criteria
 
-| Criterion | Implementation in The 8/9 Duet |
+| Criterion | Implementation in Isai |
 | :--- | :--- |
 | **Novelty & Creativity** | Transforms abstract operator contextuality into a musical duet. Left/Right stereo panning allows the ear to hear bipartite entanglement; matching crossing bits resonate in pure unison, while classical or noise-induced defects produce harsh semitone dissonance. |
 | **Technical Execution** | 100% test coverage across both Python (`pytest`) and TypeScript (`vitest`). Pure Web Audio API synthesis (no external audio assets, no autoplay). Custom plain SVG charts with 95% Wilson confidence intervals. Strict TypeScript type-checking. |
