@@ -1,0 +1,43 @@
+<div id="container">
+  <header>
+    <h1>Isai — the Mermin–Peres magic square, live on Qollab</h1>
+    <p id="tagline">
+      Two silent players share two Bell pairs. Classically they can win at most
+      8 of the 9 row–column contexts; entanglement wins all 9. Isai turns the
+      outcomes into music in the full app — here you see the physics that
+      drives it, measured in your browser.
+    </p>
+  </header>
+
+  <div id="controls">
+    <label>Shots per context
+      <input id="shots" type="number" min="100" max="10000" step="100" value="1000">
+    </label>
+    <label>Browser noise overlay p
+      <input id="noise" type="range" min="0" max="0.06" step="0.002" value="0">
+      <span id="noiseVal">0.000</span>
+    </label>
+    <button id="sound" type="button">Sound: on</button>
+    <button id="run" type="button">Run 9 contexts (one job)</button>
+  </div>
+
+  <p id="status">Loading…</p>
+
+  <table id="results">
+    <thead>
+      <tr><th>Context</th><th>Wins / Shots</th><th>Win rate</th><th>95% Wilson CI</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="bars"></div>
+  <p id="message"></p>
+
+  <footer id="source">
+    Counts source: the Qollab-injected backend (in-browser Qiskit simulator) —
+    simulator output, not hardware. Noise overlay: classical browser-side
+    post-processing of those counts (independent bit flips at probability p),
+    clearly not a QPU noise model. Full game, audio and tutorial live in the
+    linked repository.
+  </footer>
+</div>
