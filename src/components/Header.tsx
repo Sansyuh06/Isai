@@ -11,6 +11,7 @@ interface Props {
   onOpenAbout: () => void;
   backendName: string;
   jobId?: string | null;
+  onGoHome: () => void;
 }
 
 export const Header: React.FC<Props> = ({
@@ -20,7 +21,8 @@ export const Header: React.FC<Props> = ({
   onImportFile,
   onOpenAbout,
   backendName,
-  jobId
+  jobId,
+  onGoHome
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -34,12 +36,12 @@ export const Header: React.FC<Props> = ({
 
   return (
     <header className="bg-surface border-b border-hairline sticky top-0 z-40 px-4 py-2 sm:px-8">
-      <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Brand & Source Badge */}
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-bold tracking-tight text-ink leading-none">
+          <button onClick={onGoHome} className="text-lg font-bold tracking-tight text-ink leading-none hover:text-alice transition-colors">
             The 8/9 Duet
-          </h1>
+          </button>
           <SourceBadge
             sourceType={currentSource}
             backendName={backendName}

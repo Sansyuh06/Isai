@@ -22,6 +22,7 @@ export const App: React.FC = () => {
   const [ibmData, setIbmData] = useState<MerminPeresDataset | null>(null);
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
   const [activeTab, setActiveTab] = useState<string>('play');
+  const [view, setView] = useState<'landing' | 'app'>('landing');
 
   const [selectedRow, setSelectedRow] = useState<number>(0);
   const [selectedCol, setSelectedCol] = useState<number>(0);
@@ -118,6 +119,7 @@ export const App: React.FC = () => {
         onOpenAbout={() => setIsAboutOpen(true)}
         backendName={currentDataset?.backend_name || 'None'}
         jobId={currentDataset?.ibm_job_id}
+        onGoHome={() => setView('landing')}
       />
 
       {notification && (
@@ -147,17 +149,22 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      <Hero 
-        dataset={currentDataset}
-        onHearDuet={() => {
-          setActiveTab('play');
-          handlePlayAll();
-        }}
-        onTour={() => alert('Tour feature coming soon!')}
-        onBeatClassical={() => setActiveTab('classical')}
-      />
-
-      <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8">
+      {view === 'landing' ? (
+        <Hero 
+          dataset={currentDataset}
+          onHearDuet={() => {
+            setView('app');
+            setActiveTab('play');
+            handlePlayAll();
+          }}
+          onTour={() => alert('Tour feature coming soon!')}
+          onBeatClassical={() => {
+            setView('app');
+            setActiveTab('classical');
+          }}
+        />
+      ) : (
+        <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 bg-surface border border-hairline">
             <TabsTrigger value="play">Play</TabsTrigger>
@@ -233,6 +240,7 @@ export const App: React.FC = () => {
           </TabsContent>
         </Tabs>
       </main>
+      )}
 
       <footer className="border-t border-hairline bg-surface py-6 text-center text-[14px] text-muted">
         <div className="max-w-[1400px] mx-auto px-4 flex flex-col items-center gap-2">

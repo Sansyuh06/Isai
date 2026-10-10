@@ -15,7 +15,7 @@ export const Hero: React.FC<Props> = ({ dataset, onHearDuet, onTour, onBeatClass
   const quantumPct = quantumTotal > 0 ? (quantumWins / quantumTotal * 100).toFixed(1) : '0.0';
 
   return (
-    <div className="w-full relative overflow-hidden py-16 lg:py-24 border-b border-hairline">
+    <div className="w-full flex-1 flex flex-col justify-center relative overflow-hidden py-16 lg:py-24">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-alice/10 rounded-full blur-[120px] pointer-events-none"></div>
       
