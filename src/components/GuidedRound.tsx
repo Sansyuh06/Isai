@@ -13,6 +13,9 @@ interface Props {
   selectedCol: number;
   onSelectContext: (r: number, c: number) => void;
   onPlayAll: () => void;
+  targetAct?: 'act1' | 'act2' | null;
+  onContinueToAct?: (act: 'act1' | 'act2') => void;
+  isFallbackAer?: boolean;
 }
 
 export const GuidedRound: React.FC<Props> = ({
@@ -23,7 +26,10 @@ export const GuidedRound: React.FC<Props> = ({
   selectedRow,
   selectedCol,
   onSelectContext,
-  onPlayAll
+  onPlayAll,
+  targetAct,
+  onContinueToAct,
+  isFallbackAer
 }) => {
   const [step, setStep] = useState<number>(1);
   const [sampleIndex, setSampleIndex] = useState<number>(0);
@@ -85,14 +91,35 @@ export const GuidedRound: React.FC<Props> = ({
     <div className="space-y-6">
       <div className="bg-surface border border-hairline p-4 rounded-[10px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div>
-          <h2 className="text-[18px] font-bold text-ink">Guided Round</h2>
-          <div className="text-[12px] text-muted flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2">
+            <h2 className="text-[18px] font-bold text-ink">Guided Round</h2>
+            {targetAct && (
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-ink/5 border border-hairline text-muted uppercase tracking-wider">
+                {targetAct === 'act1' ? 'Preparing for Act 1' : 'Preparing for Act 2'}
+              </span>
+            )}
+          </div>
+          <div className="text-[12px] text-muted flex flex-wrap items-center gap-2 mt-1">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-paper border border-hairline font-semibold text-ink">
-              {isAer ? <Cpu className="w-3.5 h-3.5 text-muted" /> : <Cpu className="w-3.5 h-3.5 text-alice-text" />}
-              {isAer ? 'REPLAYING AER SIMULATOR DATA' : 'RECORDED IBM HARDWARE'}
+              {isFallbackAer ? (
+                <Cpu className="w-3.5 h-3.5 text-amber-500" />
+              ) : isAer ? (
+                <Cpu className="w-3.5 h-3.5 text-muted" />
+              ) : (
+                <Cpu className="w-3.5 h-3.5 text-alice-text" />
+              )}
+              {isFallbackAer
+                ? 'SIMULATOR DATA (QISKIT AER FALLBACK)'
+                : isAer
+                ? 'REPLAYING AER SIMULATOR DATA'
+                : 'RECORDED IBM HARDWARE'}
             </span>
             <span>·</span>
-            <span>These are saved results. This page is replaying a result, not submitting a new quantum job.</span>
+            <span>
+              {isFallbackAer
+                ? 'No recorded IBM run loaded; showing verified local Qiskit Aer simulation.'
+                : 'These are saved results. This page is replaying a result, not submitting a new quantum job.'}
+            </span>
           </div>
         </div>
       </div>
@@ -378,18 +405,54 @@ qc.cx(1, 3) # Bell pair 2 (A2, B2)`}
                   </div>
                 </div>
 
-                <div className="border-t border-hairline pt-6 flex gap-4 justify-between">
+                <div className="border-t border-hairline pt-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div className="space-y-1">
-                     <p className="text-[14px] font-bold text-ink">Next Steps</p>
-                     <p className="text-[12px] text-muted">Play all rounds or check the Results tab for aggregate stats.</p>
+                    <p className="text-[14px] font-bold text-ink">
+                      {targetAct ? 'Ready to Explore' : 'Next Steps'}
+                    </p>
+                    <p className="text-[12px] text-muted">
+                      {targetAct === 'act1'
+                        ? 'Now try setting your own classical strategy and see if you can break the 8/9 barrier.'
+                        : targetAct === 'act2'
+                        ? 'Now enter the quantum lab to hear the entangled 9/9 duet across all contexts.'
+                        : 'Play all 9 rounds or explore the interactive acts.'}
+                    </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={onPlayAll}
-                    className="px-6 py-2 bg-surface border border-hairline text-ink rounded-full text-[14px] font-bold hover:bg-hairline/50 transition-colors"
-                  >
-                    Play all 9 rounds
-                  </button>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {targetAct && onContinueToAct ? (
+                      <button
+                        type="button"
+                        onClick={() => onContinueToAct(targetAct)}
+                        className="px-6 py-2.5 bg-ink text-paper rounded-full text-[14px] font-bold hover:scale-105 transition-transform shadow-[0_0_15px_rgba(255,255,255,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                      >
+                        {targetAct === 'act1' ? 'Continue to Act 1: Break it →' : 'Continue to Act 2: Entangle it →'}
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => onContinueToAct?.('act1')}
+                          className="px-4 py-2 bg-surface border border-hairline text-ink rounded-full text-[13px] font-bold hover:bg-hairline/50 transition-colors"
+                        >
+                          Act 1: Break it
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onContinueToAct?.('act2')}
+                          className="px-4 py-2 bg-surface border border-hairline text-ink rounded-full text-[13px] font-bold hover:bg-hairline/50 transition-colors"
+                        >
+                          Act 2: Entangle it
+                        </button>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={onPlayAll}
+                      className="px-4 py-2 bg-surface border border-hairline text-ink rounded-full text-[13px] font-bold hover:bg-hairline/50 transition-colors"
+                    >
+                      Play all 9 rounds
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

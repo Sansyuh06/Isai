@@ -25,6 +25,8 @@ export const App: React.FC = () => {
   const [currentSource, setCurrentSource] = useState<SourceType>('qiskit_aer');
   const [activeTab, setActiveTab] = useState<string>('act1');
   const [view, setView] = useState<'landing' | 'app'>('landing');
+  const [targetAct, setTargetAct] = useState<'act1' | 'act2' | null>(null);
+  const [tutorialSessionKey, setTutorialSessionKey] = useState<number>(0);
 
   const [selectedRow, setSelectedRow] = useState<number>(0);
   const [selectedCol, setSelectedCol] = useState<number>(0);
@@ -121,7 +123,10 @@ export const App: React.FC = () => {
         onOpenAbout={() => setIsAboutOpen(true)}
         backendName={currentDataset?.backend_name || 'None'}
         jobId={currentDataset?.ibm_job_id}
-        onGoHome={() => setView('landing')}
+        onGoHome={() => {
+          setView('landing');
+          setTargetAct(null);
+        }}
       />
 
       {notification && (
@@ -155,21 +160,37 @@ export const App: React.FC = () => {
         <Hero 
           dataset={currentDataset}
           onHearDuet={() => {
+            setTargetAct('act2');
+            setTutorialSessionKey((k) => k + 1);
             setView('app');
-            setActiveTab('act2');
+            setActiveTab('tutorial');
           }}
           onTour={() => {
+            setTargetAct(null);
+            setTutorialSessionKey((k) => k + 1);
             setView('app');
             setActiveTab('tutorial');
           }}
           onBeatClassical={() => {
+            setTargetAct('act1');
+            setTutorialSessionKey((k) => k + 1);
             setView('app');
-            setActiveTab('act1');
+            setActiveTab('tutorial');
           }}
         />
       ) : (
         <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val === 'tutorial') {
+              setTutorialSessionKey((k) => k + 1);
+              setTargetAct(null);
+            }
+            setActiveTab(val);
+          }}
+          className="w-full"
+        >
           <TabsList className="mb-6 bg-surface border border-hairline flex flex-wrap h-auto">
             <TabsTrigger value="act1">Act 1: Break it</TabsTrigger>
             <TabsTrigger value="act2">Act 2: Entangle it</TabsTrigger>
@@ -191,6 +212,71 @@ export const App: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="tutorial" className="space-y-6">
+            {currentSource === 'ibm_hardware' && ibmData === null && (
+              <div className="bg-surface border border-hairline rounded-[10px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-500/10 via-surface to-surface shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 rounded-[4px] bg-amber-500/20 text-amber-300 font-mono text-[11px] font-bold tracking-wider uppercase border border-amber-500/30">
+                    SIMULATION FALLBACK
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-ink">
+                      No recorded IBM hardware run loaded.
+                    </p>
+                    <p className="text-[12px] text-muted">
+                      Tutorial is running on verified Qiskit Aer simulator data.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentSource('qiskit_aer')}
+                    className="text-[12px] px-3 py-1.5 rounded-full bg-surface border border-hairline hover:bg-hairline/50 text-ink font-medium transition-colors"
+                  >
+                    Switch to Aer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                      fileInput?.click();
+                    }}
+                    className="text-[12px] px-3 py-1.5 rounded-full bg-ink text-paper hover:scale-105 font-bold transition-transform"
+                  >
+                    Import IBM JSON
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <GuidedRound
+              key={tutorialSessionKey}
+              dataset={currentSource === 'ibm_hardware' && ibmData === null ? aerData : (currentDataset || aerData)}
+              isFallbackAer={currentSource === 'ibm_hardware' && ibmData === null}
+              audioEngine={audioEngine}
+              activeStepEvent={activeStepEvent}
+              onSetActiveStepEvent={setActiveStepEvent}
+              selectedRow={selectedRow}
+              selectedCol={selectedCol}
+              onSelectContext={(r, c) => {
+                handleStop();
+                setSelectedRow(r);
+                setSelectedCol(c);
+              }}
+              onPlayAll={handlePlayAll}
+              targetAct={targetAct}
+              onContinueToAct={(act) => {
+                setActiveTab(act);
+                setTargetAct(null);
+              }}
+            />
+            
+            <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              <ActiveCircuit row={selectedRow} col={selectedCol} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="results" className="space-y-8">
             {currentSource === 'ibm_hardware' && ibmData === null ? (
               <EmptyHardwareState
                 onSwitchToAer={() => setCurrentSource('qiskit_aer')}
@@ -200,31 +286,6 @@ export const App: React.FC = () => {
                 }}
               />
             ) : currentDataset ? (
-              <>
-                <GuidedRound
-                  dataset={currentDataset}
-                  audioEngine={audioEngine}
-                  activeStepEvent={activeStepEvent}
-                  onSetActiveStepEvent={setActiveStepEvent}
-                  selectedRow={selectedRow}
-                  selectedCol={selectedCol}
-                  onSelectContext={(r, c) => {
-                    handleStop();
-                    setSelectedRow(r);
-                    setSelectedCol(c);
-                  }}
-                  onPlayAll={handlePlayAll}
-                />
-                
-                <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-                  <ActiveCircuit row={selectedRow} col={selectedCol} />
-                </div>
-              </>
-            ) : null}
-          </TabsContent>
-
-          <TabsContent value="results" className="space-y-8">
-            {currentDataset && (
               <>
                 <WinRateChart
                   contexts={currentDataset.contexts}
@@ -245,7 +306,7 @@ export const App: React.FC = () => {
                   }}
                 />
               </>
-            )}
+            ) : null}
             <SourcesPanel dataset={currentDataset} />
           </TabsContent>
         </Tabs>
