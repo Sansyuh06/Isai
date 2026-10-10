@@ -7,6 +7,7 @@ import { audioEngine, VisualStepEvent } from './audio/synth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Header } from './components/Header';
 import { GuidedRound } from './components/GuidedRound';
+import { ActiveCircuit } from './components/ActiveCircuit';
 import { ClassicalComparison } from './components/ClassicalComparison';
 import { WinRateChart } from './components/WinRateChart';
 import { HistoryTable } from './components/HistoryTable';
@@ -144,7 +145,7 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      <main className="flex-1 max-w-[1100px] w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8">
         <Tabs defaultValue="play" className="w-full">
           <TabsList className="mb-6 bg-surface border border-hairline">
             <TabsTrigger value="play">Play</TabsTrigger>
@@ -163,20 +164,26 @@ export const App: React.FC = () => {
                 }}
               />
             ) : currentDataset ? (
-              <GuidedRound
-                dataset={currentDataset}
-                audioEngine={audioEngine}
-                activeStepEvent={activeStepEvent}
-                onSetActiveStepEvent={setActiveStepEvent}
-                selectedRow={selectedRow}
-                selectedCol={selectedCol}
-                onSelectContext={(r, c) => {
-                  handleStop();
-                  setSelectedRow(r);
-                  setSelectedCol(c);
-                }}
-                onPlayAll={handlePlayAll}
-              />
+              <>
+                <GuidedRound
+                  dataset={currentDataset}
+                  audioEngine={audioEngine}
+                  activeStepEvent={activeStepEvent}
+                  onSetActiveStepEvent={setActiveStepEvent}
+                  selectedRow={selectedRow}
+                  selectedCol={selectedCol}
+                  onSelectContext={(r, c) => {
+                    handleStop();
+                    setSelectedRow(r);
+                    setSelectedCol(c);
+                  }}
+                  onPlayAll={handlePlayAll}
+                />
+                
+                <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                  <ActiveCircuit row={selectedRow} col={selectedCol} />
+                </div>
+              </>
             ) : null}
           </TabsContent>
 
@@ -216,7 +223,7 @@ export const App: React.FC = () => {
       </main>
 
       <footer className="border-t border-hairline bg-surface py-6 text-center text-[14px] text-muted">
-        <div className="max-w-[1100px] mx-auto px-4 flex flex-col items-center gap-2">
+        <div className="max-w-[1400px] mx-auto px-4 flex flex-col items-center gap-2">
           <div>
             <strong>The 8/9 Duet</strong> — Publicly Judgeable Qollab Quantum Hackathon Submission
           </div>

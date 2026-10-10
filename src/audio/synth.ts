@@ -93,28 +93,50 @@ class QuantumDuetAudioEngine {
     const startTime = when > 0 ? when : ctx.currentTime;
     const stopTime = startTime + duration;
 
-    // Dual oscillator: fundamental sine + warm triangle overtone
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
+    // Soothing electric piano/marimba-like synthesis
+    const osc1 = ctx.createOscillator(); // Fundamental
+    const osc2 = ctx.createOscillator(); // First harmonic (octave)
+    
+    const osc1Gain = ctx.createGain();
+    const osc2Gain = ctx.createGain();
+    
+    const filter = ctx.createBiquadFilter();
     const noteGain = ctx.createGain();
 
+    // Waveforms: smooth sine fundamental, very subtle triangle for warmth
     osc1.type = 'sine';
     osc1.frequency.setValueAtTime(freq, startTime);
 
     osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(freq, startTime);
+    osc2.frequency.setValueAtTime(freq * 2, startTime); // Octave up
 
-    // ADSR Envelope
-    const attack = 0.02;
-    const decay = duration * 0.35;
-    const sustainLevel = 0.6;
-    const release = 0.05;
+    // Mix the oscillators: mostly fundamental
+    osc1Gain.gain.setValueAtTime(0.8, startTime);
+    osc2Gain.gain.setValueAtTime(0.15, startTime);
 
+    // Warm Lowpass Filter: sweeps down to mimic a plucked/struck string
+    filter.type = 'lowpass';
+    filter.Q.setValueAtTime(0.5, startTime);
+    filter.frequency.setValueAtTime(freq * 4, startTime); // Start bright
+    filter.frequency.exponentialRampToValueAtTime(freq * 1.5, startTime + duration * 0.5); // Decay to warm
+
+    // Envelope (ADSR) - Plucked, soothing contour
+    const attack = 0.015;
+    const decay = duration * 0.4;
+    const sustainLevel = 0.3;
+    const release = 0.4; // Soft lingering tail
+
+    // Start silent, quick attack
     noteGain.gain.setValueAtTime(0.001, startTime);
-    noteGain.gain.linearRampToValueAtTime(0.65, startTime + attack);
-    noteGain.gain.exponentialRampToValueAtTime(sustainLevel * 0.65, startTime + attack + decay);
-    noteGain.gain.setValueAtTime(sustainLevel * 0.65, stopTime - release);
-    noteGain.gain.exponentialRampToValueAtTime(0.001, stopTime);
+    noteGain.gain.exponentialRampToValueAtTime(0.7, startTime + attack);
+    
+    // Smooth decay to sustain
+    noteGain.gain.exponentialRampToValueAtTime(sustainLevel, startTime + attack + decay);
+    
+    // Release drops smoothly to 0 after stopTime
+    const trueStopTime = stopTime;
+    noteGain.gain.setValueAtTime(sustainLevel, trueStopTime);
+    noteGain.gain.exponentialRampToValueAtTime(0.001, trueStopTime + release);
 
     // Stereo Panning
     let outputNode: AudioNode = noteGain;
@@ -135,13 +157,19 @@ class QuantumDuetAudioEngine {
       outputNode.connect(ctx.destination);
     }
 
-    osc1.connect(noteGain);
-    osc2.connect(noteGain);
+    // Routing
+    osc1.connect(osc1Gain);
+    osc2.connect(osc2Gain);
+    osc1Gain.connect(filter);
+    osc2Gain.connect(filter);
+    filter.connect(noteGain);
 
     osc1.start(startTime);
     osc2.start(startTime);
-    osc1.stop(stopTime);
-    osc2.stop(stopTime);
+    
+    // Stop oscillators after release finishes
+    osc1.stop(trueStopTime + release);
+    osc2.stop(trueStopTime + release);
 
     this.activeNodes.push({ osc: osc1, gain: noteGain });
     this.activeNodes.push({ osc: osc2, gain: noteGain });

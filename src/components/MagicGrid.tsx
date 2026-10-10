@@ -97,8 +97,8 @@ export const MagicGrid: React.FC<Props> = ({
                         key={`cell-${r}-${c}`}
                         type="button"
                         onClick={() => onSelectContext(r, c)}
-                        className={`relative overflow-hidden flex flex-col items-center justify-center rounded-[6px] border border-ink min-h-[76px] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 ${
-                          isAudioActive ? 'opacity-70' : ''
+                        className={`relative overflow-hidden flex flex-col items-center justify-center rounded-[6px] border border-ink min-h-[76px] transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 ${
+                          isAudioActive ? 'scale-110 shadow-lg z-10' : ''
                         }`}
                         aria-label={`Crossing Cell (${r + 1}, ${c + 1}): Observable ${OBSERVABLE_MATRIX[r][c]}, ${sharedMatch ? 'Match' : 'Mismatch'}`}
                       >
@@ -140,14 +140,16 @@ export const MagicGrid: React.FC<Props> = ({
                           ? 'bg-bob/5 border-bob/20 hover:border-bob/30'
                           : 'bg-surface border-hairline hover:bg-paper'
                       } ${
-                        isAudioActive ? 'bg-win/10 border-win/30' : ''
+                        isAliceActive ? 'bg-alice text-surface scale-105 shadow-md border-alice z-10 transition-transform duration-75' : ''
+                      } ${
+                        isBobActive ? 'bg-bob text-surface scale-105 shadow-md border-bob z-10 transition-transform duration-75' : ''
                       }`}
                       aria-label={`Cell (${r + 1}, ${c + 1}): Observable ${OBSERVABLE_MATRIX[r][c]}`}
                     >
-                      <span className="font-mono text-[16px] font-bold tracking-tight text-ink">
+                      <span className={`font-mono text-[16px] font-bold tracking-tight ${isAudioActive ? 'text-surface' : 'text-ink'}`}>
                         {OBSERVABLE_MATRIX[r][c]}
                       </span>
-                      <span className="text-[12px] text-muted font-mono mt-1">
+                      <span className={`text-[12px] font-mono mt-1 ${isAudioActive ? 'text-surface/80' : 'text-muted'}`}>
                         {noteBase}
                       </span>
                     </button>
