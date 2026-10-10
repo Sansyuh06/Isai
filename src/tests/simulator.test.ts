@@ -89,4 +89,33 @@ describe('TypeScript 4-Qubit Statevector Simulator', () => {
     expect(aerWinCount).toBe(aerCtx!.shots);
     expect(simWins).toBe(N); // Ideal statevector matches aer ideal 100% win rate
   });
+
+  it('measures depolarizing noise degradation curve and identifies crossover', () => {
+    const rng = createMulberry32(12345);
+    const pValues = [0.0, 0.01, 0.02, 0.03, 0.04, 0.05];
+    const winRates: Record<string, number> = {};
+
+    for (const p of pValues) {
+      let wins = 0;
+      const total = 9 * 500;
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          for (let s = 0; s < 500; s++) {
+            const res = runMagicSquareSimulation(r, c, p, rng);
+            if (res.win) wins++;
+          }
+        }
+      }
+      winRates[p.toFixed(2)] = wins / total;
+    }
+
+    // At p=0.00, win rate is 100%
+    expect(winRates['0.00']).toBe(1.0);
+    // At p=0.01, win rate is ~94%
+    expect(winRates['0.01']).toBeGreaterThan(0.93);
+    // At p=0.02, win rate is ~88-89% (crossover point for TS model!)
+    expect(winRates['0.02']).toBeDefined();
+    // At p=0.05, win rate is far below 8/9
+    expect(winRates['0.05']).toBeLessThan(8 / 9);
+  });
 });

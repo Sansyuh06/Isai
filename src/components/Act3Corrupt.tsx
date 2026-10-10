@@ -181,7 +181,7 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
           Corrupt It: The Fragility of Entanglement
         </h2>
         <p className="text-muted text-[16px] leading-relaxed">
-          Stochastic Pauli depolarizing noise (with Pauli $X, Y, Z$ inserted with probability $p/3$ after each gate) models state decoherence. 
+          Stochastic Pauli depolarizing noise (with Pauli X, Y, Z inserted with probability p/3 after each gate) models state decoherence. 
           Notice how fidelity degrades and acoustic unisons fracture into random dissonant semitone clashes.
         </p>
       </div>
@@ -277,15 +277,15 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
               />
               <div className="flex justify-between text-[10px] font-mono text-muted">
                 <span>0.000 (Ideal 100%)</span>
-                <span>~0.02 (Model Crossover)</span>
+                <span>~0.02–0.04 (Model Crossover)</span>
                 <span>0.150 (Heavy Noise)</span>
               </div>
             </div>
 
             {/* Note on crossover */}
             <div className="p-3 bg-surface rounded-[8px] border border-hairline text-[11px] leading-relaxed text-muted">
-              <strong>Noise Model Specifics:</strong> Error $p$ represents the per-gate depolarizing channel probability for this circuit topology. 
-              The threshold where win rate drops below 8/9 is model-specific ($\approx 0.02$ for this 4-qubit circuit) and not a universal physical constant.
+              <strong>Noise Model Specifics:</strong> Error probability p represents the per-gate depolarizing channel probability for this circuit topology. 
+              The threshold where win rate drops below 8/9 is model-specific (~0.02 to 0.04 depending on gate noise application) and not a universal physical constant.
             </div>
 
             {/* Optional Hardware Toggle */}

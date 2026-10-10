@@ -16,7 +16,8 @@ interface DataPoint {
 export const NoiseCrossoverChart: React.FC = () => {
   const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [crossoverInterval, setCrossoverInterval] = useState<string | null>('0.040 – 0.050');
+  const aerCrossover = (aerNoisyData as any).metadata?.crossover_interval || '0.03 – 0.04';
+  const [crossoverInterval, setCrossoverInterval] = useState<string | null>('0.020 – 0.030');
 
   // Compute curve asynchronously in chunks to prevent freezing UI
   const calculateCurve = () => {
@@ -40,7 +41,7 @@ export const NoiseCrossoverChart: React.FC = () => {
             break;
           }
         }
-        setCrossoverInterval(foundInterval || '0.040 – 0.050');
+        setCrossoverInterval(foundInterval || '0.020 – 0.030');
         return;
       }
 
@@ -112,16 +113,19 @@ export const NoiseCrossoverChart: React.FC = () => {
             Theoretical vs. Empirical Noise Curve
           </span>
           <h3 className="text-lg font-display font-bold text-ink">
-            Win Rate vs. Gate Error Probability ($p$)
+            Win Rate vs. Gate Error Probability (p)
           </h3>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {crossoverInterval && (
-            <span className="text-xs font-mono px-2.5 py-1 rounded bg-bob/10 border border-bob/30 text-bob font-bold">
-              Crossover: $p \in [{crossoverInterval}]$
+            <span className="text-xs font-mono px-2.5 py-1 rounded bg-win/10 border border-win/30 text-win font-bold">
+              Browser Crossover: p in [{crossoverInterval}]
             </span>
           )}
+          <span className="text-xs font-mono px-2.5 py-1 rounded bg-bob/10 border border-bob/30 text-bob font-bold">
+            Aer Crossover: p in [{aerCrossover}]
+          </span>
           <button
             type="button"
             disabled={isCalculating}
@@ -243,12 +247,17 @@ export const NoiseCrossoverChart: React.FC = () => {
         </svg>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 text-[11px] font-mono text-muted border-t border-hairline pt-3">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-win inline-block"></span> Simulated Mean (95% CI)</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 border border-bob inline-block"></span> Qiskit Aer 0.17 Benchmark</span>
+      <div className="flex flex-col gap-2 text-[11px] font-mono text-muted border-t border-hairline pt-3">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-win inline-block"></span> In-Browser Statevector (95% CI)</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 border border-bob inline-block"></span> Qiskit Aer 0.17 Benchmark</span>
+          </div>
+          <span className="text-[10px] text-loss font-bold">Classical Limit: 8/9 (88.9%)</span>
         </div>
-        <span>Model: Independent depolarizing per-wire gate errors</span>
+        <p className="text-[10px] text-muted leading-relaxed font-sans">
+          <strong>Model assumptions:</strong> The in-browser model applies independent 1-qubit depolarizing error p to each wire after each gate (including both wires of CX gates, yielding an effective 2-qubit error of ~2p per CX), crossing 8/9 near p in [{crossoverInterval}]. Qiskit Aer applies a single joint 2-qubit depolarizing error channel on CX, crossing 8/9 near p in [{aerCrossover}].
+        </p>
       </div>
     </div>
   );

@@ -1,41 +1,76 @@
 {
   "metadata": {
-    "aer_version": "0.17.2",
     "qiskit_version": "2.5.1",
+    "aer_version": "0.17.2",
     "seed": 12345,
     "shots_per_context": 500,
-    "description": "Depolarizing noise model on 1q (h, s, sdg) and 2q (cx) gates"
+    "total_shots_per_p": 4500,
+    "noise_rules": "depolarizing_error(p, 1) on [h, s, sdg]; depolarizing_error(p, 2) on [cx]",
+    "crossover_interval": "0.03 \u2013 0.04"
   },
   "results": {
-    "0.0": {
+    "0.00": {
       "win_rate": 1.0,
       "total": 4500,
-      "wins": 4500
+      "wins": 4500,
+      "ci_95": [
+        0.9991,
+        1.0
+      ]
     },
     "0.01": {
-      "win_rate": 0.9686666666666667,
+      "win_rate": 0.9677777777777777,
       "total": 4500,
-      "wins": 4359
+      "wins": 4355,
+      "ci_95": [
+        0.9622,
+        0.9726
+      ]
     },
     "0.02": {
-      "win_rate": 0.9413333333333334,
+      "win_rate": 0.9373333333333334,
       "total": 4500,
-      "wins": 4236
+      "wins": 4218,
+      "ci_95": [
+        0.9299,
+        0.944
+      ]
     },
     "0.03": {
-      "win_rate": 0.918,
+      "win_rate": 0.91,
       "total": 4500,
-      "wins": 4131
+      "wins": 4095,
+      "ci_95": [
+        0.9013,
+        0.918
+      ]
     },
     "0.04": {
-      "win_rate": 0.8935555555555555,
+      "win_rate": 0.8788888888888889,
       "total": 4500,
-      "wins": 4021
+      "wins": 3955,
+      "ci_95": [
+        0.869,
+        0.8881
+      ]
     },
     "0.05": {
-      "win_rate": 0.8693333333333333,
+      "win_rate": 0.8535555555555555,
       "total": 4500,
-      "wins": 3912
+      "wins": 3841,
+      "ci_95": [
+        0.8429,
+        0.8636
+      ]
+    },
+    "0.06": {
+      "win_rate": 0.8273333333333334,
+      "total": 4500,
+      "wins": 3723,
+      "ci_95": [
+        0.816,
+        0.8381
+      ]
     }
   }
 }
