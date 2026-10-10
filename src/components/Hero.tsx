@@ -53,8 +53,8 @@ export const Hero: React.FC<Props> = ({ dataset, onHearDuet, onTour, onBeatClass
           <button onClick={onTour} className="px-6 py-4 bg-surface border border-hairline text-ink rounded-full font-bold text-[16px] hover:bg-hairline/50 transition-colors">
             60-second judge tour
           </button>
-          <button onClick={onBeatClassical} className="px-6 py-4 text-muted hover:text-ink font-bold text-[16px] transition-colors underline decoration-hairline underline-offset-4">
-            Try to beat 8/9
+          <button onClick={onBeatClassical} className="flex items-center gap-2 px-6 py-4 bg-bob/10 border border-bob/30 text-bob-text rounded-full font-bold text-[16px] hover:bg-bob/20 transition-colors">
+            Act 1: Try to beat 8/9
           </button>
         </div>
       </div>
