@@ -366,7 +366,7 @@ qc.cx(1, 3) # Bell pair 2 (A2, B2)`}
                     type="button"
                     onClick={handlePlayAudio}
                     disabled={isPlaying}
-                    className="flex items-center gap-2 px-6 py-3 bg-ink text-surface rounded-full font-bold hover:bg-ink/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
+                    className="flex items-center gap-2 px-6 py-3 bg-ink text-paper rounded-full font-bold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-[0_0_20px_rgba(255,255,255,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
                   >
                     <Music className="w-5 h-5" />
                     {isPlaying ? 'Playing...' : 'Play Audio'}
@@ -386,7 +386,7 @@ qc.cx(1, 3) # Bell pair 2 (A2, B2)`}
                   <button
                     type="button"
                     onClick={onPlayAll}
-                    className="px-4 py-2 bg-paper text-ink border border-hairline rounded-[6px] text-[12px] font-bold hover:bg-surface transition-colors"
+                    className="px-6 py-2 bg-surface border border-hairline text-ink rounded-full text-[14px] font-bold hover:bg-hairline/50 transition-colors"
                   >
                     Play all 9 rounds
                   </button>

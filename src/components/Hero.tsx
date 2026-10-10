@@ -47,10 +47,10 @@ export const Hero: React.FC<Props> = ({ dataset, onHearDuet, onTour, onBeatClass
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <button onClick={onHearDuet} className="flex items-center gap-2 px-8 py-4 bg-ink text-surface rounded-full font-bold text-[16px] hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          <button onClick={onHearDuet} className="flex items-center gap-2 px-8 py-4 bg-ink text-paper rounded-full font-bold text-[16px] hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.1)]">
             <PlayCircle className="w-5 h-5" /> Hear the duet
           </button>
-          <button onClick={onTour} className="px-6 py-4 bg-surface/5 border border-hairline text-ink rounded-full font-bold text-[16px] hover:bg-surface/10 transition-colors">
+          <button onClick={onTour} className="px-6 py-4 bg-surface border border-hairline text-ink rounded-full font-bold text-[16px] hover:bg-hairline/50 transition-colors">
             60-second judge tour
           </button>
           <button onClick={onBeatClassical} className="px-6 py-4 text-muted hover:text-ink font-bold text-[16px] transition-colors underline decoration-hairline underline-offset-4">
