@@ -9,7 +9,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { GuidedRound } from './components/GuidedRound';
 import { ActiveCircuit } from './components/ActiveCircuit';
-import { ClassicalComparison } from './components/ClassicalComparison';
+import { ClassicalPuzzle } from './components/ClassicalPuzzle';
 import { WinRateChart } from './components/WinRateChart';
 import { HistoryTable } from './components/HistoryTable';
 import { EmptyHardwareState } from './components/EmptyHardwareState';
@@ -232,7 +232,7 @@ export const App: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="classical">
-            <ClassicalComparison />
+            <ClassicalPuzzle />
           </TabsContent>
 
           <TabsContent value="sources" className="space-y-6">
