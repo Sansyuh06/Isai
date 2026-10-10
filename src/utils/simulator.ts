@@ -1,3 +1,5 @@
+import { PRNG, createMulberry32 } from './prng';
+
 export type Complex = [number, number]; // [real, imag]
 
 export function complexAdd(a: Complex, b: Complex): Complex {
@@ -27,10 +29,8 @@ export class Statevector {
       const bit = (i >> target) & 1;
       const flipped = i ^ (1 << target);
       if (bit === 0) {
-        // i is the state where target is 0
         newAmps[i] = complexAdd(complexMult(matrix[0], this.amplitudes[i]), complexMult(matrix[1], this.amplitudes[flipped]));
       } else {
-        // i is the state where target is 1
         newAmps[i] = complexAdd(complexMult(matrix[2], this.amplitudes[flipped]), complexMult(matrix[3], this.amplitudes[i]));
       }
     }
@@ -59,10 +59,10 @@ export class Statevector {
     return this.amplitudes.map(a => a[0] * a[0] + a[1] * a[1]);
   }
 
-  // Measurement (destructive / sampled) - returns measured integer 0-15
-  measure(): number {
+  // Measurement (destructive / sampled) with injectable PRNG
+  measure(rng: PRNG = Math.random): number {
     const probs = this.getProbabilities();
-    const r = Math.random();
+    const r = rng();
     let sum = 0;
     for (let i = 0; i < 16; i++) {
       sum += probs[i];
@@ -114,13 +114,13 @@ export const GATES = {
   ] as [Complex, Complex, Complex, Complex]
 };
 
-// Depolarizing noise
-function applyNoise(sv: Statevector, qubit: number, p: number) {
+// Depolarizing noise using injectable PRNG
+function applyNoise(sv: Statevector, qubit: number, p: number, rng: PRNG = Math.random) {
   if (p <= 0) return;
-  if (Math.random() < p) {
-    const errorType = Math.random();
-    if (errorType < 1/3) sv.apply1Q(GATES.X, qubit);
-    else if (errorType < 2/3) sv.apply1Q(GATES.Y, qubit);
+  if (rng() < p) {
+    const errorType = rng();
+    if (errorType < 1 / 3) sv.apply1Q(GATES.X, qubit);
+    else if (errorType < 2 / 3) sv.apply1Q(GATES.Y, qubit);
     else sv.apply1Q(GATES.Z, qubit);
   }
 }
@@ -157,54 +157,57 @@ export function decodeBobBits(col: number, b0: number, b1: number): [number, num
   }
 }
 
-export function buildStatevectorCircuit(row: number, col: number, noiseP: number = 0): Statevector {
+export function buildStatevectorCircuit(row: number, col: number, noiseP: number = 0, rng: PRNG = Math.random): Statevector {
   const sv = new Statevector();
   // Qubits: A0=0, A1=1, B0=2, B1=3
   
   // Entanglement Prep: Bell pairs on (A0, B0) and (A1, B1)
   sv.apply1Q(GATES.H, 0);
-  applyNoise(sv, 0, noiseP);
+  applyNoise(sv, 0, noiseP, rng);
   sv.applyCX(0, 2);
-  applyNoise(sv, 0, noiseP); applyNoise(sv, 2, noiseP);
+  applyNoise(sv, 0, noiseP, rng); applyNoise(sv, 2, noiseP, rng);
 
   sv.apply1Q(GATES.H, 1);
-  applyNoise(sv, 1, noiseP);
+  applyNoise(sv, 1, noiseP, rng);
   sv.applyCX(1, 3);
-  applyNoise(sv, 1, noiseP); applyNoise(sv, 3, noiseP);
+  applyNoise(sv, 1, noiseP, rng); applyNoise(sv, 3, noiseP, rng);
 
   // Alice Basis (Row)
   if (row === 0) {
-    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP);
-    sv.apply1Q(GATES.H, 1); applyNoise(sv, 1, noiseP);
+    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP, rng);
+    sv.apply1Q(GATES.H, 1); applyNoise(sv, 1, noiseP, rng);
   } else if (row === 1) {
-    sv.apply1Q(GATES.Sdg, 0); applyNoise(sv, 0, noiseP);
-    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP);
-    sv.apply1Q(GATES.Sdg, 1); applyNoise(sv, 1, noiseP);
-    sv.apply1Q(GATES.H, 1); applyNoise(sv, 1, noiseP);
+    sv.apply1Q(GATES.Sdg, 0); applyNoise(sv, 0, noiseP, rng);
+    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP, rng);
+    sv.apply1Q(GATES.Sdg, 1); applyNoise(sv, 1, noiseP, rng);
+    sv.apply1Q(GATES.H, 1); applyNoise(sv, 1, noiseP, rng);
   } else {
-    sv.apply1Q(GATES.S, 0); applyNoise(sv, 0, noiseP);
-    sv.applyCX(0, 1); applyNoise(sv, 0, noiseP); applyNoise(sv, 1, noiseP);
-    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP);
+    sv.apply1Q(GATES.S, 0); applyNoise(sv, 0, noiseP, rng);
+    sv.applyCX(0, 1); applyNoise(sv, 0, noiseP, rng); applyNoise(sv, 1, noiseP, rng);
+    sv.apply1Q(GATES.H, 0); applyNoise(sv, 0, noiseP, rng);
   }
 
   // Bob Basis (Col)
   if (col === 0) {
-    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP);
-    sv.apply1Q(GATES.S, 3); applyNoise(sv, 3, noiseP);
-    sv.apply1Q(GATES.H, 3); applyNoise(sv, 3, noiseP);
+    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP, rng);
+    sv.apply1Q(GATES.S, 3); applyNoise(sv, 3, noiseP, rng);
+    sv.apply1Q(GATES.H, 3); applyNoise(sv, 3, noiseP, rng);
   } else if (col === 1) {
-    sv.apply1Q(GATES.H, 3); applyNoise(sv, 3, noiseP);
-    sv.apply1Q(GATES.S, 2); applyNoise(sv, 2, noiseP);
-    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP);
+    sv.apply1Q(GATES.H, 3); applyNoise(sv, 3, noiseP, rng);
+    sv.apply1Q(GATES.S, 2); applyNoise(sv, 2, noiseP, rng);
+    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP, rng);
   } else {
-    sv.applyCX(2, 3); applyNoise(sv, 2, noiseP); applyNoise(sv, 3, noiseP);
-    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP);
+    sv.applyCX(2, 3); applyNoise(sv, 2, noiseP, rng); applyNoise(sv, 3, noiseP, rng);
+    sv.apply1Q(GATES.H, 2); applyNoise(sv, 2, noiseP, rng);
   }
 
   sv.normalize();
   return sv;
 }
 
+/**
+ * Pure pre-measurement API: returns exact ideal joint outcome probabilities for context (row, col)
+ */
 export function getExactContextOutcomeProbabilities(row: number, col: number): Record<string, number> {
   const sv = buildStatevectorCircuit(row, col, 0);
   const probs = sv.getProbabilities();
@@ -228,9 +231,25 @@ export function getExactContextOutcomeProbabilities(row: number, col: number): R
   return outcomeMap;
 }
 
-export function runMagicSquareSimulation(row: number, col: number, noiseP: number = 0) {
-  const sv = buildStatevectorCircuit(row, col, noiseP);
-  const res = sv.measure();
+/**
+ * Sampled measurement API with optional PRNG or seed for full reproducibility.
+ */
+export function runMagicSquareSimulation(
+  row: number, 
+  col: number, 
+  noiseP: number = 0,
+  seedOrRng?: number | PRNG
+): {
+  aliceBits: [number, number, number];
+  bobBits: [number, number, number];
+  win: boolean;
+} {
+  const rng: PRNG = typeof seedOrRng === 'number'
+    ? createMulberry32(seedOrRng)
+    : (seedOrRng || Math.random);
+
+  const sv = buildStatevectorCircuit(row, col, noiseP, rng);
+  const res = sv.measure(rng);
   const a0 = (res >> 0) & 1;
   const a1 = (res >> 1) & 1;
   const b0 = (res >> 2) & 1;
