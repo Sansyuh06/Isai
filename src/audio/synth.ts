@@ -2,12 +2,12 @@
  * Web Audio API synthesizer for The 8/9 Duet.
  *
  * Implements:
- * - Lazy AudioContext creation on user gesture
- * - Master gain and mute control
- * - Stereo panning (Alice left -0.7, Bob right +0.7)
- * - ADSR envelope with warm harmonic timbre
- * - Visual step synchronization callbacks
- * - Cancellation / Stop support
+ * - Robust AudioContext initialization and async resume on user interaction
+ * - Fixed playback synchronization ID sequence
+ * - Master gain and mute controls
+ * - Stereo panning (Alice left -0.7, Bob right +0.7) with mono fallback
+ * - Warm harmonic synthesis with ADSR envelope
+ * - Synchronized visual event callbacks
  */
 
 import { getCellPitch } from './notes';
@@ -32,20 +32,26 @@ class QuantumDuetAudioEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private activeNodes: Array<{ osc: OscillatorNode; gain: GainNode }> = [];
-  private volume: number = 0.7;
+  private volume: number = 0.8;
   private muted: boolean = false;
   private currentPlayId: number = 0;
 
-  private initContext(): AudioContext {
+  public async ensureContext(): Promise<AudioContext> {
     if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtxClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioCtxClass();
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime);
       this.masterGain.connect(this.ctx.destination);
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      try {
+        await this.ctx.resume();
+      } catch (err) {
+        console.warn('AudioContext resume failed:', err);
+      }
     }
     return this.ctx;
   }
@@ -53,14 +59,14 @@ class QuantumDuetAudioEngine {
   public setVolume(vol: number): void {
     this.volume = Math.max(0, Math.min(1, vol));
     if (this.masterGain && this.ctx && !this.muted) {
-      this.masterGain.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.03);
+      this.masterGain.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.02);
     }
   }
 
   public setMuted(muted: boolean): void {
     this.muted = muted;
     if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setTargetAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime, 0.03);
+      this.masterGain.gain.setTargetAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime, 0.02);
     }
   }
 
@@ -80,14 +86,14 @@ class QuantumDuetAudioEngine {
   }
 
   /**
-   * Synthesize a warm musical tone with stereo panning.
+   * Synthesize a musical tone with stereo panning.
    */
-  public playTone(freq: number, pan: number, duration: number, when: number = 0): void {
-    const ctx = this.initContext();
+  public async playTone(freq: number, pan: number, duration: number, when: number = 0): Promise<void> {
+    const ctx = await this.ensureContext();
     const startTime = when > 0 ? when : ctx.currentTime;
     const stopTime = startTime + duration;
 
-    // Dual oscillator: fundamental sine + soft triangle overtone
+    // Dual oscillator: fundamental sine + warm triangle overtone
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const noteGain = ctx.createGain();
@@ -99,28 +105,34 @@ class QuantumDuetAudioEngine {
     osc2.frequency.setValueAtTime(freq, startTime);
 
     // ADSR Envelope
-    const attack = 0.03;
-    const decay = duration * 0.4;
-    const sustainLevel = 0.4;
-    const release = 0.08;
+    const attack = 0.02;
+    const decay = duration * 0.35;
+    const sustainLevel = 0.6;
+    const release = 0.05;
 
-    noteGain.gain.setValueAtTime(0.0001, startTime);
-    noteGain.gain.exponentialRampToValueAtTime(0.5, startTime + attack);
-    noteGain.gain.exponentialRampToValueAtTime(sustainLevel * 0.5, startTime + attack + decay);
-    noteGain.gain.setValueAtTime(sustainLevel * 0.5, stopTime - release);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+    noteGain.gain.setValueAtTime(0.001, startTime);
+    noteGain.gain.linearRampToValueAtTime(0.65, startTime + attack);
+    noteGain.gain.exponentialRampToValueAtTime(sustainLevel * 0.65, startTime + attack + decay);
+    noteGain.gain.setValueAtTime(sustainLevel * 0.65, stopTime - release);
+    noteGain.gain.exponentialRampToValueAtTime(0.001, stopTime);
 
     // Stereo Panning
-    let pannerNode: AudioNode = noteGain;
+    let outputNode: AudioNode = noteGain;
     if (typeof ctx.createStereoPanner === 'function') {
-      const panner = ctx.createStereoPanner();
-      panner.pan.setValueAtTime(Math.max(-1, Math.min(1, pan)), startTime);
-      noteGain.connect(panner);
-      pannerNode = panner;
+      try {
+        const panner = ctx.createStereoPanner();
+        panner.pan.setValueAtTime(Math.max(-1, Math.min(1, pan)), startTime);
+        noteGain.connect(panner);
+        outputNode = panner;
+      } catch {
+        outputNode = noteGain;
+      }
     }
 
     if (this.masterGain) {
-      pannerNode.connect(this.masterGain);
+      outputNode.connect(this.masterGain);
+    } else {
+      outputNode.connect(ctx.destination);
     }
 
     osc1.connect(noteGain);
@@ -141,8 +153,10 @@ class QuantumDuetAudioEngine {
 
   /**
    * Replay a recorded sample context:
-   * Plays Alice's 3-note phrase (panned left) and Bob's 3-note phrase (panned right),
-   * followed by the shared crossing cell harmony check.
+   * 1. Stops any ongoing sound.
+   * 2. Resumes AudioContext.
+   * 3. Plays Alice's phrase (left pan) and Bob's phrase (right pan) step-by-step.
+   * 4. Plays the crossing cell unison harmony check.
    */
   public async playContextRound(
     row: number,
@@ -151,14 +165,19 @@ class QuantumDuetAudioEngine {
     bobBits: [number, number, number],
     onStep?: StepCallback
   ): Promise<boolean> {
-    const playId = ++this.currentPlayId;
+    // 1. Stop previous nodes first
     this.stopAll();
-    this.initContext();
 
-    const noteDuration = 0.38;
-    const stepInterval = 0.45;
+    // 2. Ensure AudioContext is ready and resumed
+    await this.ensureContext();
 
-    // Step 0, 1, 2: play Alice cell (row, step) and Bob cell (step, col)
+    // 3. Increment playId AFTER stopAll so loop doesn't abort!
+    const playId = ++this.currentPlayId;
+
+    const noteDuration = 0.4;
+    const stepInterval = 0.48;
+
+    // Steps 0, 1, 2: Alice note and Bob note in sequence
     for (let step = 0; step < 3; step++) {
       if (this.currentPlayId !== playId) return false;
 
@@ -170,7 +189,6 @@ class QuantumDuetAudioEngine {
       const aPitch = getCellPitch(row, aCol, aBit);
       const bPitch = getCellPitch(bRow, col, bBit);
 
-      // Trigger visual step event
       if (onStep) {
         onStep({
           step,
@@ -187,9 +205,8 @@ class QuantumDuetAudioEngine {
         });
       }
 
-      // Play Alice note panned left (-0.7)
+      // Alice left (-0.7), Bob right (+0.7)
       this.playTone(aPitch.freq, -0.7, noteDuration);
-      // Play Bob note panned right (+0.7)
       this.playTone(bPitch.freq, 0.7, noteDuration);
 
       await new Promise((r) => setTimeout(r, stepInterval * 1000));
@@ -198,7 +215,6 @@ class QuantumDuetAudioEngine {
     if (this.currentPlayId !== playId) return false;
 
     // Step 3: Shared Cell Crossing Harmony Check!
-    // Both Alice (left) and Bob (right) play their recorded bits for the crossing cell (row, col)
     const crossingAliceBit = aliceBits[col];
     const crossingBobBit = bobBits[row];
     const crossingAlicePitch = getCellPitch(row, col, crossingAliceBit);
@@ -221,11 +237,11 @@ class QuantumDuetAudioEngine {
       });
     }
 
-    // Matching bits sound in unison! Different bits sound as adjacent semitones.
-    this.playTone(crossingAlicePitch.freq, -0.7, 0.65);
-    this.playTone(crossingBobPitch.freq, 0.7, 0.65);
+    // Matching bits sound in unison; different bits sound as adjacent semitones
+    this.playTone(crossingAlicePitch.freq, -0.7, 0.75);
+    this.playTone(crossingBobPitch.freq, 0.7, 0.75);
 
-    await new Promise((r) => setTimeout(r, 750));
+    await new Promise((r) => setTimeout(r, 850));
 
     if (this.currentPlayId === playId && onStep) {
       onStep(null);
