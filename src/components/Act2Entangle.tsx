@@ -128,24 +128,48 @@ export const Act2Entangle: React.FC = () => {
             bobBits={lastResult?.bobBits}
           />
           
-          <div className="flex items-center gap-4">
+          {/* Playback Controls Strip: Play one, Next Context, Play all, Stop */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              disabled={isPlaying}
+              onClick={() => runSingle(selectedRow, selectedCol)}
+              className="px-5 py-2.5 rounded-full font-bold text-xs bg-surface border border-hairline text-ink hover:bg-surface/80 transition-all disabled:opacity-50"
+            >
+              Play One (R{selectedRow + 1}C{selectedCol + 1})
+            </button>
+
+            <button
+              type="button"
+              disabled={isPlaying}
+              onClick={() => {
+                const nextIdx = (selectedRow * 3 + selectedCol + 1) % 9;
+                const nextR = Math.floor(nextIdx / 3);
+                const nextC = nextIdx % 3;
+                runSingle(nextR, nextC);
+              }}
+              className="px-5 py-2.5 rounded-full font-bold text-xs bg-surface border border-hairline text-ink hover:bg-surface/80 transition-all disabled:opacity-50"
+            >
+              Next Context
+            </button>
+
             <button 
               type="button"
               onClick={playNineBeatLoop}
-              className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold text-[15px] transition-all shadow-lg
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs transition-all shadow-md
                 ${isPlaying 
                   ? 'bg-loss text-white hover:bg-loss/90 animate-pulse' 
-                  : 'bg-win text-paper hover:scale-105 shadow-[0_0_30px_rgba(91,227,168,0.25)]'
+                  : 'bg-win text-paper hover:scale-105 shadow-[0_0_20px_rgba(91,227,168,0.25)]'
                 }
               `}
             >
               {isPlaying ? (
                 <>
-                  <StopCircle className="w-5 h-5"/> Stop Playback
+                  <StopCircle className="w-4 h-4"/> Stop Playback
                 </>
               ) : (
                 <>
-                  <PlayCircle className="w-5 h-5"/> Hear the 9/9 Unison Loop
+                  <PlayCircle className="w-4 h-4"/> Play All (9/9 Loop)
                 </>
               )}
             </button>
@@ -155,7 +179,7 @@ export const Act2Entangle: React.FC = () => {
                 type="button"
                 onClick={handleResetCumulative}
                 disabled={isPlaying}
-                className="p-3.5 rounded-full bg-surface border border-hairline text-muted hover:text-ink transition-colors disabled:opacity-40"
+                className="p-2.5 rounded-full bg-surface border border-hairline text-muted hover:text-ink transition-colors disabled:opacity-40"
                 title="Reset Recorded Contexts"
               >
                 <RotateCcw className="w-4 h-4" />

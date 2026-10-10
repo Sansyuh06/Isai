@@ -11,6 +11,7 @@ import {
   areAllIndependentBitsSet, 
   evaluateGridsAgreement 
 } from '../utils/classicalStrategy';
+import { ClassicalCommunication } from './ClassicalCommunication';
 
 interface Props {
   onStrategyUpdated?: (alice: NullableBitGrid, bob: NullableBitGrid) => void;
@@ -388,6 +389,11 @@ export const ClassicalPuzzle: React.FC<Props> = ({ onStrategyUpdated }) => {
             </p>
           </div>
         )}
+      </div>
+
+      {/* Classical Communication Comparison Section */}
+      <div className="w-full pt-6 border-t border-hairline">
+        <ClassicalCommunication />
       </div>
     </div>
   );

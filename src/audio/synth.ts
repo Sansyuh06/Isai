@@ -309,9 +309,9 @@ class QuantumDuetAudioEngine {
         onBeat(i, isMatch);
       }
 
-      // Alice panned left (-0.7), Bob panned right (+0.7)
-      this.playTone(aPitch.freq, -0.7, beatDuration);
-      this.playTone(bPitch.freq, 0.7, beatDuration);
+      // In compact crossing-cell loop, play both centered (pan=0) so semitone clash is crystal clear on headphones
+      this.playTone(aPitch.freq, 0, beatDuration);
+      this.playTone(bPitch.freq, 0, beatDuration);
 
       await new Promise((r) => setTimeout(r, beatInterval * 1000));
     }

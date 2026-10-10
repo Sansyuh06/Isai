@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "aer_version": "0.17.2",
+    "qiskit_version": "2.5.1",
+    "seed": 12345,
+    "shots_per_context": 500,
+    "description": "Depolarizing noise model on 1q (h, s, sdg) and 2q (cx) gates"
+  },
+  "results": {
+    "0.0": {
+      "win_rate": 1.0,
+      "total": 4500,
+      "wins": 4500
+    },
+    "0.01": {
+      "win_rate": 0.9686666666666667,
+      "total": 4500,
+      "wins": 4359
+    },
+    "0.02": {
+      "win_rate": 0.9413333333333334,
+      "total": 4500,
+      "wins": 4236
+    },
+    "0.03": {
+      "win_rate": 0.918,
+      "total": 4500,
+      "wins": 4131
+    },
+    "0.04": {
+      "win_rate": 0.8935555555555555,
+      "total": 4500,
+      "wins": 4021
+    },
+    "0.05": {
+      "win_rate": 0.8693333333333333,
+      "total": 4500,
+      "wins": 3912
+    }
+  }
+}

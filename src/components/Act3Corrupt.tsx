@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PlayCircle, StopCircle, AlertTriangle } from 'lucide-react';
 import { MagicGrid } from './MagicGrid';
+import { NoiseCrossoverChart } from './NoiseCrossoverChart';
 import { runMagicSquareSimulation } from '../utils/simulator';
 import { audioEngine } from '../audio/synth';
 import { MerminPeresDataset } from '../types/data';
@@ -197,11 +198,35 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
             bobBits={activeCtxResult?.sampleBobBits}
           />
           
-          <div className="flex items-center gap-4">
+          {/* Playback Controls Strip: Play one, Next Context, Play all, Stop */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              disabled={isPlaying}
+              onClick={() => runSingle(selectedRow, selectedCol)}
+              className="px-5 py-2.5 rounded-full font-bold text-xs bg-surface border border-hairline text-ink hover:bg-surface/80 transition-all disabled:opacity-50"
+            >
+              Play One (R{selectedRow + 1}C{selectedCol + 1})
+            </button>
+
+            <button
+              type="button"
+              disabled={isPlaying}
+              onClick={() => {
+                const nextIdx = (selectedRow * 3 + selectedCol + 1) % 9;
+                const nextR = Math.floor(nextIdx / 3);
+                const nextC = nextIdx % 3;
+                runSingle(nextR, nextC);
+              }}
+              className="px-5 py-2.5 rounded-full font-bold text-xs bg-surface border border-hairline text-ink hover:bg-surface/80 transition-all disabled:opacity-50"
+            >
+              Next Context
+            </button>
+
             <button 
               type="button"
               onClick={playNineBeatLoop}
-              className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold text-[15px] transition-all shadow-lg
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-xs transition-all shadow-md
                 ${isPlaying 
                   ? 'bg-loss text-white hover:bg-loss/90 animate-pulse' 
                   : 'bg-ink text-paper hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.1)]'
@@ -210,11 +235,11 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
             >
               {isPlaying ? (
                 <>
-                  <StopCircle className="w-5 h-5"/> Stop Playback
+                  <StopCircle className="w-4 h-4"/> Stop Playback
                 </>
               ) : (
                 <>
-                  <PlayCircle className="w-5 h-5"/> Play Noisy 9-Beat Loop
+                  <PlayCircle className="w-4 h-4"/> Play All (Noisy Loop)
                 </>
               )}
             </button>
@@ -311,6 +336,11 @@ export const Act3Corrupt: React.FC<Props> = ({ ibmDataset }) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Embedded Crossover Analysis Chart */}
+      <div className="w-full">
+        <NoiseCrossoverChart />
       </div>
     </div>
   );
