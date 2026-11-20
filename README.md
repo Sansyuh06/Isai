@@ -189,6 +189,12 @@ qollab/         Qollab platform runner
 4. E. de Dios Rodríguez et al., *The Sound of Entanglement*, [arXiv:2509.08892](https://arxiv.org/abs/2509.08892) (2025).
 5. Fun-with-Quantum, interactive Magic Square tutorial ([PR #70](https://github.com/JanLahmann/Fun-with-Quantum/pull/70)) and noisy/hardware extension ([PR #103](https://github.com/JanLahmann/Fun-with-Quantum/pull/103)).
 
+### Post-Hackathon References
+
+1. G. De las Cuevas, T. Drescher, and T. Netzer, *Quantum magic squares: dilations and their limitations*, [arXiv:1912.07332](https://arxiv.org/abs/1912.07332) (2019).
+2. J.-M. Xu et al., *Experimental Demonstration of Quantum Pseudotelepathy*, [arXiv:2206.12042](https://arxiv.org/abs/2206.12042) (2022).
+3. Google Quantum AI, *A game you cannot win unless you have a quantum computer*, [Google Research Blog](https://research.google/blog/a-game-you-cannot-win-unless-you-have-a-quantum-computer/) (2026).
+
 ## Credits
 
 Built with React, TypeScript, Vite, Tailwind CSS, Radix UI, Lucide icons and IBM Plex / Fraunces fonts via Fontsource, plus Qiskit and Qiskit Aer for the reference circuits and data. Thanks to Qollab and IonQ for the hackathon.
