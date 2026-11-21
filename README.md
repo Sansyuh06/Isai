@@ -197,4 +197,4 @@ qollab/         Qollab platform runner
 
 ## Try the demo with Qollab
 
-https://.xyz/u/sans_yuh/isai-the-8-9-duet
+https://qollab.xyz/u/sans_yuh/isai-the-8-9-duet
