@@ -195,6 +195,6 @@ qollab/         Qollab platform runner
 2. J.-M. Xu et al., *Experimental Demonstration of Quantum Pseudotelepathy*, [arXiv:2206.12042](https://arxiv.org/abs/2206.12042) (2022).
 3. Google Quantum AI, *A game you cannot win unless you have a quantum computer*, [Google Research Blog](https://research.google/blog/a-game-you-cannot-win-unless-you-have-a-quantum-computer/) (2026).
 
-## Credits
+## Try the demo with Qollab
 
-Built with React, TypeScript, Vite, Tailwind CSS, Radix UI, Lucide icons and IBM Plex / Fraunces fonts via Fontsource, plus Qiskit and Qiskit Aer for the reference circuits and data. Thanks to Qollab and IonQ for the hackathon.
+https://.xyz/u/sans_yuh/isai-the-8-9-duet
